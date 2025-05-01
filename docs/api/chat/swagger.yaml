@@ -1,0 +1,1382 @@
+basePath: /api
+definitions:
+  dto.AddParticipantRequest:
+    properties:
+      role:
+        enum:
+        - member
+        - admin
+        - super_admin
+        type: string
+      userId:
+        type: string
+    required:
+    - role
+    - userId
+    type: object
+  dto.CreateChatroomRequest:
+    properties:
+      isGroup:
+        type: boolean
+      name:
+        type: string
+      participants:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      type:
+        enum:
+        - public
+        - private
+        - squad
+        type: string
+    required:
+    - name
+    - type
+    type: object
+  dto.CreateClientRequest:
+    properties:
+      authEndpoint:
+        type: string
+      clientKey:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - authEndpoint
+    - clientKey
+    - name
+    type: object
+  dto.CreateUserRequest:
+    properties:
+      level:
+        minimum: 0
+        type: integer
+      name:
+        type: string
+      picture:
+        type: string
+      userId:
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - userId
+    - username
+    type: object
+  dto.MuteParticipantRequest:
+    properties:
+      duration:
+        description: Duration in minutes
+        minimum: 1
+        type: integer
+    required:
+    - duration
+    type: object
+  dto.SendDirectMessageRequest:
+    properties:
+      message:
+        type: string
+      receiverId:
+        type: string
+    required:
+    - message
+    - receiverId
+    type: object
+  dto.SendMessageRequest:
+    properties:
+      message:
+        type: string
+    required:
+    - message
+    type: object
+  dto.UpdateChatRequest:
+    properties:
+      message:
+        type: string
+    required:
+    - message
+    type: object
+  dto.UpdateChatroomRequest:
+    properties:
+      name:
+        type: string
+      type:
+        enum:
+        - public
+        - private
+        - squad
+        type: string
+    required:
+    - name
+    - type
+    type: object
+  dto.UpdateClientRequest:
+    properties:
+      authEndpoint:
+        type: string
+      clientKey:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      status:
+        enum:
+        - active
+        - inactive
+        type: string
+    required:
+    - authEndpoint
+    - clientKey
+    - name
+    - status
+    type: object
+  dto.UpdateParticipantRequest:
+    properties:
+      role:
+        enum:
+        - member
+        - admin
+        - super_admin
+        type: string
+    required:
+    - role
+    type: object
+  dto.UpdateUserRequest:
+    properties:
+      level:
+        minimum: 0
+        type: integer
+      name:
+        type: string
+      picture:
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - username
+    type: object
+  entity.Chat:
+    properties:
+      chatroom:
+        description: Can be string ID or Chatroom object
+        type: string
+      createdTimestamp:
+        type: integer
+      id:
+        type: string
+      message:
+        type: string
+      premium:
+        type: boolean
+      receiver:
+        description: Null for group chats
+        type: string
+      sender:
+        description: Reference to Users collection
+        type: string
+    type: object
+  entity.Chatroom:
+    properties:
+      createdTimestamp:
+        type: integer
+      id:
+        type: string
+      isGroup:
+        type: boolean
+      lastMessage:
+        type: string
+      lastMessageTimestamp:
+        type: integer
+      lastSender:
+        type: string
+      messagesCount:
+        type: integer
+      name:
+        type: string
+      participants:
+        items:
+          $ref: '#/definitions/entity.ChatroomParticipant'
+        type: array
+      type:
+        $ref: '#/definitions/entity.ChatroomType'
+    type: object
+  entity.ChatroomParticipant:
+    properties:
+      id:
+        type: string
+      joinedTimestamp:
+        type: integer
+      mutedUntilTimestamp:
+        type: integer
+      role:
+        $ref: '#/definitions/entity.ParticipantRole'
+      user:
+        type: string
+    type: object
+  entity.ChatroomType:
+    enum:
+    - public
+    - private
+    - squad
+    type: string
+    x-enum-varnames:
+    - ChatroomTypePublic
+    - ChatroomTypePrivate
+    - ChatroomTypeSquad
+  entity.Client:
+    properties:
+      authEndpoint:
+        type: string
+      clientKey:
+        type: string
+      createdTimestamp:
+        type: integer
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      updatedTimestamp:
+        type: integer
+    type: object
+  entity.ParticipantRole:
+    enum:
+    - member
+    - admin
+    - super_admin
+    type: string
+    x-enum-varnames:
+    - ParticipantRoleMember
+    - ParticipantRoleAdmin
+    - ParticipantRoleSuperAdmin
+  entity.User:
+    properties:
+      id:
+        type: string
+      level:
+        type: integer
+      name:
+        type: string
+      picture:
+        type: string
+      userId:
+        type: string
+      username:
+        type: string
+    type: object
+  http.ErrorResponse:
+    properties:
+      errors: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  http.GeneralResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  http.PaginatedResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: infamous0192@gmail.com
+    name: Not Boring Company
+  description: Chat Microservice for Wonderverse Apps
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Wonderverse Chat Service
+  version: 1.0.0
+paths:
+  /v1/admin/clients:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new client with the provided details
+      parameters:
+      - description: Client details
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateClientRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Client'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new client
+      tags:
+      - clients
+  /v1/admin/clients/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing client
+      parameters:
+      - description: Client ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Client'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a client
+      tags:
+      - clients
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a client by its ID
+      parameters:
+      - description: Client ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Client'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a client by ID
+      tags:
+      - clients
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing client
+      parameters:
+      - description: Client ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Client details
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateClientRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Client'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a client
+      tags:
+      - clients
+  /v1/admin/users:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user with the provided details
+      parameters:
+      - description: User details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Create a new user
+      tags:
+      - users
+  /v1/admin/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.User'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Delete a user
+      tags:
+      - users
+  /v1/chatrooms:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves chatrooms with filtering and pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/entity.Chatroom'
+                        type: array
+                    type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get chatrooms
+      tags:
+      - chatrooms
+    post:
+      consumes:
+      - application/json
+      description: Creates a new chatroom with the provided details
+      parameters:
+      - description: Chatroom details
+        in: body
+        name: chatroom
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateChatroomRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Create a new chatroom
+      tags:
+      - chatrooms
+  /v1/chatrooms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing chatroom
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Delete a chatroom
+      tags:
+      - chatrooms
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single chatroom by ID
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get a chatroom
+      tags:
+      - chatrooms
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing chatroom
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Chatroom details
+        in: body
+        name: chatroom
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateChatroomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Update a chatroom
+      tags:
+      - chatrooms
+  /v1/chatrooms/{id}/participants:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new participant to an existing chatroom
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Participant details
+        in: body
+        name: participant
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddParticipantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Add a participant to a chatroom
+      tags:
+      - chatrooms
+  /v1/chatrooms/{id}/participants/{userId}:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a participant from an existing chatroom
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Remove a participant from a chatroom
+      tags:
+      - chatrooms
+  /v1/chatrooms/{id}/participants/{userId}/mute:
+    post:
+      consumes:
+      - application/json
+      description: Mutes a participant in a chatroom for a specified duration
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Mute details
+        in: body
+        name: mute
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MuteParticipantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Mute a participant
+      tags:
+      - chatrooms
+  /v1/chatrooms/{id}/participants/{userId}/role:
+    put:
+      consumes:
+      - application/json
+      description: Updates the role of a participant in a chatroom
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Role details
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateParticipantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Update a participant's role
+      tags:
+      - chatrooms
+  /v1/chatrooms/{id}/participants/{userId}/unmute:
+    post:
+      consumes:
+      - application/json
+      description: Removes the mute from a participant in a chatroom
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chatroom'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Unmute a participant
+      tags:
+      - chatrooms
+  /v1/chats:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves chat messages with filtering and pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Filter by chatroom ID
+        in: query
+        name: roomId
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/entity.Chat'
+                        type: array
+                    type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get chat messages
+      tags:
+      - chats
+  /v1/chats/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes an existing chat message
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chat'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Delete a chat message
+      tags:
+      - chats
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single chat message by ID
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chat'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get a chat message
+      tags:
+      - chats
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing chat message
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Chat details
+        in: body
+        name: chat
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chat'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Update a chat message
+      tags:
+      - chats
+  /v1/chats/direct:
+    post:
+      consumes:
+      - application/json
+      description: Sends a direct message to another user
+      parameters:
+      - description: Message details
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SendDirectMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chat'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Send a direct message
+      tags:
+      - chats
+  /v1/chats/rooms/{roomId}:
+    post:
+      consumes:
+      - application/json
+      description: Sends a new message to a specific chatroom
+      parameters:
+      - description: Chatroom ID
+        in: path
+        name: roomId
+        required: true
+        type: string
+      - description: Message details
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SendMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Chat'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Send a message to a chatroom
+      tags:
+      - chats
+  /v1/clients:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves clients with filtering and pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/entity.Client'
+                        type: array
+                    type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get clients
+      tags:
+      - clients
+  /v1/clients/validate:
+    get:
+      consumes:
+      - application/json
+      description: Validates a client key and returns the client if valid
+      parameters:
+      - description: Client Key
+        in: header
+        name: X-Client-Key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.Client'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Validate a client key
+      tags:
+      - clients
+  /v1/users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves users with filtering and pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/entity.User'
+                        type: array
+                    type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get users
+      tags:
+      - users
+  /v1/users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.User'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get a user
+      tags:
+      - users
+  /v1/users/me:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.User'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entity.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      summary: Update a user
+      tags:
+      - users
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    description: API Key for Client
+    in: header
+    name: X-Client-Key
+    type: apiKey
+  BearerAuth:
+    description: Authorization For JWT
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

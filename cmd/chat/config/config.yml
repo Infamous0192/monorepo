@@ -1,0 +1,35 @@
+server:
+  name: "Wonderverse Chat"
+  version: "1.0.0"
+  env: "development"
+  url: "http://localhost:8080"
+  host: "0.0.0.0"
+  port: "8080"
+  debug: true
+  exec_path: false
+  upload_limit: 8  # 8MB
+
+  cors:
+    allow_origins: "*"
+    allow_methods: "GET,POST,PUT,DELETE,OPTIONS"
+    allow_headers: "Origin,Content-Type,Accept,Authorization,X-Client-Key"
+    allow_credentials: false
+    expose_headers: "Content-Length,Content-Type"
+    max_age: 24
+
+app:
+  api_key: ${APP_API_KEY}
+
+mongodb:
+  host: ${MONGODB_HOST:-localhost}
+  port: ${MONGODB_PORT:-27017}
+  database: ${MONGODB_DATABASE:-wonderverse_chat}
+  username: ${MONGODB_USERNAME:-wonderverse}
+  password: ${MONGODB_PASSWORD:-wonderverse123}
+
+redis:
+  host: ${REDIS_HOST:-localhost}
+  port: ${REDIS_PORT:-6379}
+  database: ${REDIS_DATABASE:-0}
+  username: ${REDIS_USERNAME:-default}
+  password: ${REDIS_PASSWORD:-redis123}

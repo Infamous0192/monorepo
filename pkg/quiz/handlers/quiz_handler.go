@@ -1,0 +1,219 @@
+package handlers
+
+import (
+	"app/pkg/exception"
+	"app/pkg/quiz/domain/entity"
+	"app/pkg/quiz/services"
+	"app/pkg/types/http"
+	"app/pkg/validation"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+// QuizHandler handles HTTP requests related to quizzes
+type QuizHandler struct {
+	services   *services.Services
+	validation *validation.Validation
+}
+
+// NewQuizHandler creates a new quiz handler
+func NewQuizHandler(services *services.Services) *QuizHandler {
+	return &QuizHandler{
+		services:   services,
+		validation: validation.NewValidation(),
+	}
+}
+
+// GetQuizzes retrieves a list of quizzes with optional filtering and pagination
+// @Summary Get all quizzes
+// @Description Get all quizzes with pagination and filtering options
+// @Tags quizzes
+// @Accept json
+// @Produce json
+// @Param keyword query string false "Search keyword"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(10)
+// @Success 200 {object} http.GeneralResponse
+// @Failure 400 {object} http.GeneralResponse
+// @Failure 500 {object} http.GeneralResponse
+// @Router /quizzes [get]
+func (h *QuizHandler) GetQuizzes(c *fiber.Ctx) error {
+	// Parse query parameters
+	query := new(entity.QuizQuery)
+	if err := h.validation.Query(query, c); err != nil {
+		return err
+	}
+
+	// Set default pagination if not provided
+	if query.Page <= 0 {
+		query.Page = 1
+	}
+	if query.Limit <= 0 {
+		query.Limit = 10
+	}
+
+	// Get quizzes from service
+	result, err := h.services.Quiz.FindAll(c.Context(), *query)
+	if err != nil {
+		return err
+	}
+
+	// Return response
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Quizzes retrieved successfully",
+		Data:    result,
+	})
+}
+
+// GetQuiz retrieves a single quiz by ID
+// @Summary Get quiz by ID
+// @Description Get details of a specific quiz by its ID
+// @Tags quizzes
+// @Accept json
+// @Produce json
+// @Param id path int true "Quiz ID"
+// @Success 200 {object} http.GeneralResponse
+// @Failure 400 {object} http.GeneralResponse
+// @Failure 404 {object} http.GeneralResponse
+// @Failure 500 {object} http.GeneralResponse
+// @Router /quizzes/{id} [get]
+func (h *QuizHandler) GetQuiz(c *fiber.Ctx) error {
+	// Parse quiz ID from URL
+	id, err := h.validation.ParamsInt(c)
+	if err != nil {
+		return err
+	}
+
+	// Get quiz from service
+	quiz, err := h.services.Quiz.FindOne(c.Context(), uint(id))
+	if err != nil {
+		return err
+	}
+
+	// Check if quiz exists
+	if quiz == nil {
+		return exception.NotFound("quiz")
+	}
+
+	// Return response
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Quiz retrieved successfully",
+		Data:    quiz,
+	})
+}
+
+// CreateQuiz creates a new quiz
+// @Summary Create a new quiz
+// @Description Create a new quiz with the provided information
+// @Tags quizzes
+// @Accept json
+// @Produce json
+// @Param quiz body entity.QuizDTO true "Quiz information"
+// @Success 201 {object} http.GeneralResponse
+// @Failure 400 {object} http.GeneralResponse
+// @Failure 401 {object} http.GeneralResponse
+// @Failure 500 {object} http.GeneralResponse
+// @Security BearerAuth
+// @Router /quizzes [post]
+func (h *QuizHandler) CreateQuiz(c *fiber.Ctx) error {
+	// Parse request body
+	quizDTO := new(entity.QuizDTO)
+	if err := h.validation.Body(quizDTO, c); err != nil {
+		return err
+	}
+
+	// Create quiz using service
+	quiz, err := h.services.Quiz.Create(c.Context(), *quizDTO)
+	if err != nil {
+		return err
+	}
+
+	// Return response
+	return c.Status(fiber.StatusCreated).JSON(http.GeneralResponse{
+		Status:  fiber.StatusCreated,
+		Message: "Quiz created successfully",
+		Data:    quiz,
+	})
+}
+
+// UpdateQuiz updates an existing quiz
+// @Summary Update an existing quiz
+// @Description Update a quiz with the provided information
+// @Tags quizzes
+// @Accept json
+// @Produce json
+// @Param id path int true "Quiz ID"
+// @Param quiz body entity.QuizDTO true "Updated quiz information"
+// @Success 200 {object} http.GeneralResponse
+// @Failure 400 {object} http.GeneralResponse
+// @Failure 401 {object} http.GeneralResponse
+// @Failure 404 {object} http.GeneralResponse
+// @Failure 500 {object} http.GeneralResponse
+// @Security BearerAuth
+// @Router /quizzes/{id} [put]
+func (h *QuizHandler) UpdateQuiz(c *fiber.Ctx) error {
+	// Parse quiz ID from URL
+	id, err := h.validation.ParamsInt(c)
+	if err != nil {
+		return err
+	}
+
+	// Parse request body
+	quizDTO := new(entity.QuizDTO)
+	if err := h.validation.Body(quizDTO, c); err != nil {
+		return err
+	}
+
+	// Update quiz using service
+	quiz, err := h.services.Quiz.Update(c.Context(), uint(id), *quizDTO)
+	if err != nil {
+		return err
+	}
+
+	// Check if quiz exists
+	if quiz == nil {
+		return exception.NotFound("quiz")
+	}
+
+	// Return response
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Quiz updated successfully",
+		Data:    quiz,
+	})
+}
+
+// DeleteQuiz deletes a quiz
+// @Summary Delete a quiz
+// @Description Delete a quiz by its ID
+// @Tags quizzes
+// @Accept json
+// @Produce json
+// @Param id path int true "Quiz ID"
+// @Success 200 {object} http.GeneralResponse
+// @Failure 400 {object} http.GeneralResponse
+// @Failure 401 {object} http.GeneralResponse
+// @Failure 404 {object} http.GeneralResponse
+// @Failure 500 {object} http.GeneralResponse
+// @Security BearerAuth
+// @Router /quizzes/{id} [delete]
+func (h *QuizHandler) DeleteQuiz(c *fiber.Ctx) error {
+	// Parse quiz ID from URL
+	id, err := h.validation.ParamsInt(c)
+	if err != nil {
+		return err
+	}
+
+	// Delete quiz using service
+	if err := h.services.Quiz.Delete(c.Context(), uint(id)); err != nil {
+		return err
+	}
+
+	// Return response
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Quiz deleted successfully",
+	})
+}

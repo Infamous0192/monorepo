@@ -1,0 +1,1260 @@
+basePath: /api/v1
+definitions:
+  app_pkg_quiz_domain_entity.AnswerDTO:
+    properties:
+      question:
+        type: integer
+      text:
+        type: string
+      value:
+        type: integer
+    required:
+    - text
+    - value
+    type: object
+  app_pkg_quiz_domain_entity.OptionDTO:
+    properties:
+      content:
+        type: string
+      isCorrect:
+        type: boolean
+    required:
+    - content
+    type: object
+  app_pkg_quiz_domain_entity.QuestionDTO:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.AnswerDTO'
+        type: array
+      content:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.OptionDTO'
+        type: array
+      quizId:
+        type: integer
+    required:
+    - content
+    - quizId
+    type: object
+  app_pkg_quiz_domain_entity.QuizDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  app_pkg_quiz_domain_entity.SubmissionDTO:
+    properties:
+      answer:
+        type: integer
+      question:
+        type: integer
+      quiz:
+        type: integer
+      user:
+        type: integer
+    required:
+    - answer
+    - question
+    - quiz
+    - user
+    type: object
+  app_pkg_quiz_domain_entity.SubmissionInsertDTO:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.SubmissionDTO'
+        type: array
+    required:
+    - data
+    type: object
+  app_pkg_quiz_domain_entity.UserDTO:
+    properties:
+      birthDate:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      status:
+        type: boolean
+      username:
+        type: string
+    required:
+    - birthDate
+    - name
+    - password
+    - role
+    - status
+    - username
+    type: object
+  http.GeneralResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@nosmo.com
+    name: API Support
+    url: http://www.nosmo.com/support
+  description: This is a Quiz application API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Quiz API
+  version: "1.0"
+paths:
+  /answers:
+    get:
+      consumes:
+      - application/json
+      description: Get all answers with pagination and filtering options
+      parameters:
+      - description: Filter by question ID
+        in: query
+        name: questionId
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all answers
+      tags:
+      - answers
+    post:
+      consumes:
+      - application/json
+      description: Create a new answer with the provided information
+      parameters:
+      - description: Answer information
+        in: body
+        name: answer
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.AnswerDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new answer
+      tags:
+      - answers
+  /answers/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an answer by its ID
+      parameters:
+      - description: Answer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete an answer
+      tags:
+      - answers
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific answer by its ID
+      parameters:
+      - description: Answer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Get answer by ID
+      tags:
+      - answers
+    put:
+      consumes:
+      - application/json
+      description: Update an answer with the provided information
+      parameters:
+      - description: Answer ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated answer information
+        in: body
+        name: answer
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.AnswerDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing answer
+      tags:
+      - answers
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login with username and password to get an authentication token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      summary: Login a user
+      tags:
+      - auth
+  /auth/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get the profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the provided information
+      parameters:
+      - description: User registration information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      summary: Register a new user
+      tags:
+      - auth
+  /questions:
+    get:
+      consumes:
+      - application/json
+      description: Get all questions with pagination and filtering options
+      parameters:
+      - description: Filter by quiz ID
+        in: query
+        name: quizId
+        type: integer
+      - description: Search keyword
+        in: query
+        name: keyword
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      summary: Get all questions
+      tags:
+      - questions
+    post:
+      consumes:
+      - application/json
+      description: Create a new question with the provided information
+      parameters:
+      - description: Question information
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.QuestionDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new question
+      tags:
+      - questions
+  /questions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a question by its ID
+      parameters:
+      - description: Question ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a question
+      tags:
+      - questions
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific question by its ID
+      parameters:
+      - description: Question ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      summary: Get question by ID
+      tags:
+      - questions
+    put:
+      consumes:
+      - application/json
+      description: Update a question with the provided information
+      parameters:
+      - description: Question ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated question information
+        in: body
+        name: question
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.QuestionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing question
+      tags:
+      - questions
+  /quizzes:
+    get:
+      consumes:
+      - application/json
+      description: Get all quizzes with pagination and filtering options
+      parameters:
+      - description: Search keyword
+        in: query
+        name: keyword
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      summary: Get all quizzes
+      tags:
+      - quizzes
+    post:
+      consumes:
+      - application/json
+      description: Create a new quiz with the provided information
+      parameters:
+      - description: Quiz information
+        in: body
+        name: quiz
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.QuizDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new quiz
+      tags:
+      - quizzes
+  /quizzes/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a quiz by its ID
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a quiz
+      tags:
+      - quizzes
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific quiz by its ID
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      summary: Get quiz by ID
+      tags:
+      - quizzes
+    put:
+      consumes:
+      - application/json
+      description: Update a quiz with the provided information
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated quiz information
+        in: body
+        name: quiz
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.QuizDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing quiz
+      tags:
+      - quizzes
+  /submissions:
+    get:
+      consumes:
+      - application/json
+      description: Get all submissions with pagination and filtering options
+      parameters:
+      - description: Filter by quiz ID
+        in: query
+        name: quizId
+        type: integer
+      - description: Filter by user ID
+        in: query
+        name: userId
+        type: integer
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all submissions
+      tags:
+      - submissions
+    post:
+      consumes:
+      - application/json
+      description: Create a new submission with the provided information
+      parameters:
+      - description: Submission information
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.SubmissionDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new submission
+      tags:
+      - submissions
+  /submissions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a submission
+      tags:
+      - submissions
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific submission by its ID
+      parameters:
+      - description: Submission ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Get submission by ID
+      tags:
+      - submissions
+    put:
+      consumes:
+      - application/json
+      description: Update a submission with the provided information
+      parameters:
+      - description: Submission ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated submission information
+        in: body
+        name: submission
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.SubmissionDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Update an existing submission
+      tags:
+      - submissions
+  /submissions/bulk:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple submissions in a single request
+      parameters:
+      - description: Multiple submission information
+        in: body
+        name: submissions
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.SubmissionInsertDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Create multiple submissions
+      tags:
+      - submissions
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get all users with pagination and filtering options
+      parameters:
+      - description: Filter by email
+        in: query
+        name: email
+        type: string
+      - description: Filter by role
+        in: query
+        name: role
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the provided information
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific user by its ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update a user with the provided information
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated user information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.UserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      - ApiKeyAuth: []
+      summary: Update an existing user
+      tags:
+      - users
+schemes:
+- http
+- https
+securityDefinitions:
+  ApiKeyAuth:
+    description: API key authentication
+    in: header
+    name: X-API-Key
+    type: apiKey
+  BearerAuth:
+    description: JWT authorization with Bearer prefix
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
