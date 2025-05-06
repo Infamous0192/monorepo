@@ -16,7 +16,7 @@ type User struct {
 	Name     string `json:"name" gorm:"type:varchar(100)"`
 	Username string `json:"username" gorm:"type:varchar(100)"`
 	Password string `json:"-" gorm:"type:varchar(200)"`
-	Role     string `json:"role" gorm:"type:enum('admin','user')" enums:"admin,user"`
+	Role     string `json:"role" gorm:"type:varchar(20);check:role IN ('admin', 'user')"`
 	Status   bool   `json:"status"`
 
 	BirthDate time.Time `json:"birthDate"`
