@@ -129,7 +129,7 @@ func main() {
 	}))
 
 	// Swagger documentation
-	app.Get("/swagger/*", swagger.HandlerDefault)
+	app.Get("/docs/*", swagger.HandlerDefault)
 
 	// Register quiz routes
 	handlers.SetupRoutes(app, quizServices)
