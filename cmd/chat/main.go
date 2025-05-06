@@ -137,7 +137,7 @@ func main() {
 	wsHandler.RegisterRoutes(api)
 
 	// Swagger documentation route
-	app.Get("/swagger/*", swagger.HandlerDefault)
+	app.Get("/docs/*", swagger.HandlerDefault)
 
 	app.Get("/health", func(c *gofiber.Ctx) error {
 		return c.Status(gofiber.StatusOK).JSON(gofiber.Map{
