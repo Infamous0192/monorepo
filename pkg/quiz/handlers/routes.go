@@ -21,7 +21,7 @@ func SetupRoutes(app *fiber.App, services *services.Services) {
 	authMiddleware := middleware.NewAuthMiddleware(services.Auth)
 
 	// API group with prefix
-	api := app.Group("/api/v1")
+	api := app.Group("/api")
 
 	// Authentication routes (public)
 	authRoutes := api.Group("/auth")
