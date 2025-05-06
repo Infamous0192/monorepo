@@ -42,6 +42,18 @@ func (h *CategoryHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.
 }
 
 // GetCategories returns a list of categories with pagination and filtering
+// @Summary Get all categories
+// @Description Get all categories with pagination and filtering options
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param keyword query string false "Search keyword"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(10)
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 500 {object} error
+// @Router /categories [get]
 func (h *CategoryHandler) GetCategories(c *fiber.Ctx) error {
 	query := entity.CategoryQuery{
 		Pagination: pagination.Pagination{
@@ -82,6 +94,17 @@ func (h *CategoryHandler) GetCategories(c *fiber.Ctx) error {
 }
 
 // GetCategory returns a single category by ID
+// @Summary Get category by ID
+// @Description Get details of a specific category by its ID
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /categories/{id} [get]
 func (h *CategoryHandler) GetCategory(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {
@@ -100,6 +123,17 @@ func (h *CategoryHandler) GetCategory(c *fiber.Ctx) error {
 }
 
 // GetCategoryBySlug returns a single category by its slug
+// @Summary Get category by slug
+// @Description Get details of a specific category by its slug
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param slug path string true "Category slug"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /categories/slug/{slug} [get]
 func (h *CategoryHandler) GetCategoryBySlug(c *fiber.Ctx) error {
 	slug := c.Params("slug")
 	if err := h.validation.Field(slug, "required"); err != nil {
@@ -122,6 +156,17 @@ func (h *CategoryHandler) GetCategoryBySlug(c *fiber.Ctx) error {
 }
 
 // GetCategoryHierarchy returns the complete hierarchy of a category
+// @Summary Get category hierarchy
+// @Description Get the complete hierarchy (ancestors and descendants) of a category
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /categories/{id}/hierarchy [get]
 func (h *CategoryHandler) GetCategoryHierarchy(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {
@@ -140,6 +185,17 @@ func (h *CategoryHandler) GetCategoryHierarchy(c *fiber.Ctx) error {
 }
 
 // GetCategoryChildren returns all direct children of a category
+// @Summary Get category children
+// @Description Get all direct child categories of a specific category
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /categories/{id}/children [get]
 func (h *CategoryHandler) GetCategoryChildren(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {
@@ -158,6 +214,18 @@ func (h *CategoryHandler) GetCategoryChildren(c *fiber.Ctx) error {
 }
 
 // CreateCategory creates a new category
+// @Summary Create a new category
+// @Description Create a new category with the provided information
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param category body entity.CategoryDTO true "Category information"
+// @Success 201 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 500 {object} error
+// @Security ApiKeyAuth
+// @Router /categories [post]
 func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 	var dto entity.CategoryDTO
 
@@ -177,6 +245,20 @@ func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 }
 
 // UpdateCategory updates an existing category
+// @Summary Update an existing category
+// @Description Update a category with the provided information
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Param category body entity.CategoryDTO true "Updated category information"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Security ApiKeyAuth
+// @Router /categories/{id} [put]
 func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {
@@ -200,6 +282,19 @@ func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 }
 
 // DeleteCategory deletes a category
+// @Summary Delete a category
+// @Description Delete a category by its ID
+// @Tags categories
+// @Accept json
+// @Produce json
+// @Param id path int true "Category ID"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Security ApiKeyAuth
+// @Router /categories/{id} [delete]
 func (h *CategoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {

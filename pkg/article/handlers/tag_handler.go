@@ -41,6 +41,18 @@ func (h *TagHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.Handl
 }
 
 // GetTags returns a list of tags with pagination and filtering
+// @Summary Get all tags
+// @Description Get all tags with pagination and filtering options
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param keyword query string false "Search keyword"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(10)
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 500 {object} error
+// @Router /tags [get]
 func (h *TagHandler) GetTags(c *fiber.Ctx) error {
 	query := entity.TagQuery{
 		Pagination: pagination.Pagination{
@@ -81,6 +93,17 @@ func (h *TagHandler) GetTags(c *fiber.Ctx) error {
 }
 
 // GetTag returns a single tag by ID
+// @Summary Get tag by ID
+// @Description Get details of a specific tag by its ID
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param id path int true "Tag ID"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /tags/{id} [get]
 func (h *TagHandler) GetTag(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {
@@ -99,6 +122,17 @@ func (h *TagHandler) GetTag(c *fiber.Ctx) error {
 }
 
 // GetTagBySlug returns a single tag by its slug
+// @Summary Get tag by slug
+// @Description Get details of a specific tag by its slug
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param slug path string true "Tag slug"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /tags/slug/{slug} [get]
 func (h *TagHandler) GetTagBySlug(c *fiber.Ctx) error {
 	slug := c.Params("slug")
 	if err := h.validation.Field(slug, "required"); err != nil {
@@ -121,6 +155,17 @@ func (h *TagHandler) GetTagBySlug(c *fiber.Ctx) error {
 }
 
 // GetTagsByArticle returns all tags associated with an article
+// @Summary Get tags by article
+// @Description Get all tags associated with a specific article
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param articleId path int true "Article ID"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /tags/article/{articleId} [get]
 func (h *TagHandler) GetTagsByArticle(c *fiber.Ctx) error {
 	articleId, err := h.validation.ParamsInt(c, "articleId")
 	if err != nil {
@@ -139,6 +184,18 @@ func (h *TagHandler) GetTagsByArticle(c *fiber.Ctx) error {
 }
 
 // CreateTag creates a new tag
+// @Summary Create a new tag
+// @Description Create a new tag with the provided information
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param tag body entity.TagDTO true "Tag information"
+// @Success 201 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 500 {object} error
+// @Security ApiKeyAuth
+// @Router /tags [post]
 func (h *TagHandler) CreateTag(c *fiber.Ctx) error {
 	var dto entity.TagDTO
 
@@ -158,6 +215,20 @@ func (h *TagHandler) CreateTag(c *fiber.Ctx) error {
 }
 
 // UpdateTag updates an existing tag
+// @Summary Update an existing tag
+// @Description Update a tag with the provided information
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param id path int true "Tag ID"
+// @Param tag body entity.TagDTO true "Updated tag information"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Security ApiKeyAuth
+// @Router /tags/{id} [put]
 func (h *TagHandler) UpdateTag(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {
@@ -181,6 +252,19 @@ func (h *TagHandler) UpdateTag(c *fiber.Ctx) error {
 }
 
 // DeleteTag deletes a tag
+// @Summary Delete a tag
+// @Description Delete a tag by its ID
+// @Tags tags
+// @Accept json
+// @Produce json
+// @Param id path int true "Tag ID"
+// @Success 200 {object} fiber.Map
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Security ApiKeyAuth
+// @Router /tags/{id} [delete]
 func (h *TagHandler) DeleteTag(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {

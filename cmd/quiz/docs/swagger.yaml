@@ -1,5 +1,51 @@
-basePath: /api/v1
+basePath: /api
 definitions:
+  app_pkg_article_domain_entity.ArticleDTO:
+    properties:
+      categoryIds:
+        items:
+          type: integer
+        type: array
+      content:
+        type: string
+      publishedAt:
+        type: string
+      slug:
+        type: string
+      tagIds:
+        items:
+          type: integer
+        type: array
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
+  app_pkg_article_domain_entity.CategoryDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      parentId:
+        type: integer
+      slug:
+        type: string
+    required:
+    - name
+    type: object
+  app_pkg_article_domain_entity.TagDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+    required:
+    - name
+    type: object
   app_pkg_quiz_domain_entity.AnswerDTO:
     properties:
       question:
@@ -95,6 +141,9 @@ definitions:
     - status
     - username
     type: object
+  fiber.Map:
+    additionalProperties: true
+    type: object
   http.GeneralResponse:
     properties:
       data: {}
@@ -103,7 +152,14 @@ definitions:
       status:
         type: integer
     type: object
-host: localhost:8080
+  validation.ValidationError:
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+host: 157.245.61.194:8082
 info:
   contact:
     email: support@nosmo.com
@@ -317,6 +373,294 @@ paths:
       summary: Update an existing answer
       tags:
       - answers
+  /articles:
+    get:
+      consumes:
+      - application/json
+      description: Get all articles with pagination and filtering options
+      parameters:
+      - description: Search keyword
+        in: query
+        name: keyword
+        type: string
+      - description: Filter by category ID
+        in: query
+        name: categoryId
+        type: integer
+      - description: Filter by published status
+        in: query
+        name: published
+        type: boolean
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all articles
+      tags:
+      - articles
+    post:
+      consumes:
+      - application/json
+      description: Create a new article with the provided information
+      parameters:
+      - description: Article information
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_article_domain_entity.ArticleDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new article
+      tags:
+      - articles
+  /articles/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an article by its ID
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an article
+      tags:
+      - articles
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific article by its ID
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get article by ID
+      tags:
+      - articles
+    put:
+      consumes:
+      - application/json
+      description: Update an article with the provided information
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated article information
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_article_domain_entity.ArticleDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update an existing article
+      tags:
+      - articles
+  /articles/{id}/publish:
+    post:
+      consumes:
+      - application/json
+      description: Change the status of an article to published
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Publish an article
+      tags:
+      - articles
+  /articles/{id}/unpublish:
+    post:
+      consumes:
+      - application/json
+      description: Change the status of an article to unpublished
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Unpublish an article
+      tags:
+      - articles
+  /articles/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific article by its slug
+      parameters:
+      - description: Article slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get article by slug
+      tags:
+      - articles
   /auth/login:
     post:
       consumes:
@@ -410,6 +754,276 @@ paths:
       summary: Register a new user
       tags:
       - auth
+  /categories:
+    get:
+      consumes:
+      - application/json
+      description: Get all categories with pagination and filtering options
+      parameters:
+      - description: Search keyword
+        in: query
+        name: keyword
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all categories
+      tags:
+      - categories
+    post:
+      consumes:
+      - application/json
+      description: Create a new category with the provided information
+      parameters:
+      - description: Category information
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_article_domain_entity.CategoryDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new category
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a category
+      tags:
+      - categories
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific category by its ID
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get category by ID
+      tags:
+      - categories
+    put:
+      consumes:
+      - application/json
+      description: Update a category with the provided information
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated category information
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_article_domain_entity.CategoryDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update an existing category
+      tags:
+      - categories
+  /categories/{id}/children:
+    get:
+      consumes:
+      - application/json
+      description: Get all direct child categories of a specific category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get category children
+      tags:
+      - categories
+  /categories/{id}/hierarchy:
+    get:
+      consumes:
+      - application/json
+      description: Get the complete hierarchy (ancestors and descendants) of a category
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get category hierarchy
+      tags:
+      - categories
+  /categories/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific category by its slug
+      parameters:
+      - description: Category slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get category by slug
+      tags:
+      - categories
   /questions:
     get:
       consumes:
@@ -1030,6 +1644,245 @@ paths:
       summary: Create multiple submissions
       tags:
       - submissions
+  /tags:
+    get:
+      consumes:
+      - application/json
+      description: Get all tags with pagination and filtering options
+      parameters:
+      - description: Search keyword
+        in: query
+        name: keyword
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get all tags
+      tags:
+      - tags
+    post:
+      consumes:
+      - application/json
+      description: Create a new tag with the provided information
+      parameters:
+      - description: Tag information
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_article_domain_entity.TagDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new tag
+      tags:
+      - tags
+  /tags/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a tag by its ID
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a tag
+      tags:
+      - tags
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific tag by its ID
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get tag by ID
+      tags:
+      - tags
+    put:
+      consumes:
+      - application/json
+      description: Update a tag with the provided information
+      parameters:
+      - description: Tag ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated tag information
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/app_pkg_article_domain_entity.TagDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "401":
+          description: Unauthorized
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Update an existing tag
+      tags:
+      - tags
+  /tags/article/{articleId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all tags associated with a specific article
+      parameters:
+      - description: Article ID
+        in: path
+        name: articleId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get tags by article
+      tags:
+      - tags
+  /tags/slug/{slug}:
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific tag by its slug
+      parameters:
+      - description: Tag slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get tag by slug
+      tags:
+      - tags
   /users:
     get:
       consumes:
