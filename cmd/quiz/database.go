@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +19,7 @@ func setupQuizDatabase(db *gorm.DB) error {
 		&entity.Option{},
 		&entity.Answer{},
 		&entity.Submission{},
+		&entity.User{},
 	)
 	if err != nil {
 		log.Printf("Failed to migrate quiz database: %v", err)
@@ -27,6 +29,11 @@ func setupQuizDatabase(db *gorm.DB) error {
 	// Seed data if tables are empty
 	if err := seedQuizData(db); err != nil {
 		log.Printf("Warning: Failed to seed quiz data: %v", err)
+	}
+
+	// Seed user data if table is empty
+	if err := seedUserData(db); err != nil {
+		log.Printf("Warning: Failed to seed user data: %v", err)
 	}
 
 	log.Println("Quiz database migration completed successfully")
@@ -169,5 +176,74 @@ func seedQuizData(db *gorm.DB) error {
 	}
 
 	log.Println("Quiz data seeded successfully")
+	return nil
+}
+
+// seedUserData populates the database with initial user data if the table is empty
+func seedUserData(db *gorm.DB) error {
+	// Check if we have any users
+	var count int64
+	if err := db.Model(&entity.User{}).Count(&count).Error; err != nil {
+		return err
+	}
+
+	// If users already exist, skip seeding
+	if count > 0 {
+		log.Println("User data already exists, skipping seed")
+		return nil
+	}
+
+	log.Println("Seeding user data...")
+
+	// Generate hashed passwords
+	adminPassword, err := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	userPassword, err := bcrypt.GenerateFromPassword([]byte("user123"), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// Create sample users
+	users := []entity.User{
+		{
+			Name:      "Admin User",
+			Username:  "admin",
+			Password:  string(adminPassword),
+			Role:      entity.RoleAdmin,
+			Status:    true,
+			BirthDate: time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			Name:      "Regular User",
+			Username:  "user",
+			Password:  string(userPassword),
+			Role:      entity.RoleUser,
+			Status:    true,
+			BirthDate: time.Date(1995, 5, 15, 0, 0, 0, 0, time.UTC),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			Name:      "Inactive User",
+			Username:  "inactive",
+			Password:  string(userPassword),
+			Role:      entity.RoleUser,
+			Status:    false,
+			BirthDate: time.Date(1992, 8, 20, 0, 0, 0, 0, time.UTC),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+	}
+
+	if err := db.Create(&users).Error; err != nil {
+		return err
+	}
+
+	log.Println("User data seeded successfully")
 	return nil
 }
