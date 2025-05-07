@@ -36,7 +36,6 @@ WORKDIR /root/
 
 # Copy the binary from builder
 COPY --from=builder /app/quiz .
-COPY --from=builder /app/.env .
 
 # Expose the port
 EXPOSE 8080
