@@ -23,8 +23,6 @@ services:
       - ../../:/app:delegated
       - go-modules:/go/pkg/mod
       - ./.env:/app/.env:ro
-    depends_on:
-      - postgres
 
   postgres:
     image: postgres:latest
