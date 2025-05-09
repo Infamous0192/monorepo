@@ -2,43 +2,41 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-# Copy go.mod and go.sum files
-COPY go.mod go.sum ./
+# Install build dependencies
+RUN apk add --no-cache git
 
-# Download all dependencies
+# Download dependencies first (for better caching)
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the source code
+# Copy source code
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -o quiz ./cmd/quiz
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o quiz ./cmd/quiz
 
-# Development stage
-FROM golang:1.24-alpine AS development
+# Use a small alpine image for the final container
+FROM alpine:3.18
+
 WORKDIR /app
 
-# Install air for hot-reloading in development
-RUN go install github.com/air-verse/air@latest
-
-# Copy the entire project for development
-COPY . .
-
-# Command to run air for hot reloading
-CMD ["air", "-c", ".air/quiz.toml"]
-
-# Production stage
-FROM alpine:latest AS production
-
-RUN apk --no-cache add ca-certificates
-
-WORKDIR /root/
+# Install runtime dependencies
+RUN apk add --no-cache ca-certificates tzdata
 
 # Copy the binary from builder
 COPY --from=builder /app/quiz .
+COPY --from=builder /app/cmd/quiz/config /app/config
 
-# Expose the port
+# Create a non-root user to run the application
+RUN adduser -D -g '' appuser
+USER appuser
+
+# Set environment variables
+ENV PORT=8080
+ENV APP_ENVIRONMENT=production
+
+# Expose the application port
 EXPOSE 8080
 
-# Command to run the executable
-CMD ["./quiz"] 
+# Run the application
+CMD ["./quiz", "--config", "/app/config/config.yml"] 

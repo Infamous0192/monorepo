@@ -1,58 +1,64 @@
 version: '3.8'
 
 services:
-  quiz-service:
+  quiz-api:
     build:
       context: ../..
       dockerfile: cmd/quiz/Dockerfile
-      target: development
-    container_name: quiz-service
+    container_name: quiz-api
     restart: unless-stopped
     ports:
       - "8082:8080"
+    depends_on:
+      - quiz-db
     environment:
-      - APP_API_KEY=${APP_API_KEY:-dev-api-key}
-      - PORT=8080
-      - DB_HOST=postgres
+      - DB_HOST=quiz-db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=quiz_db
       - DB_PORT=5432
-      - DB_USER=${POSTGRES_USER:-postgres}
-      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - DB_NAME=${POSTGRES_DB:-quiz_db}
-      - API_KEY=${API_KEY:-dev-api-key}
+      - APP_ENVIRONMENT=development
+      - APP_API_KEY=your-secure-api-key
     volumes:
-      - ../../:/app:delegated
-      - go-modules:/go/pkg/mod
-      - ./.env:/app/.env:ro
+      - ./config:/app/config
+    networks:
+      - quiz-network
 
-  postgres:
-    image: postgres:latest
-    container_name: postgres
+  quiz-db:
+    image: postgres:15-alpine
+    container_name: quiz-db
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DB=${POSTGRES_DB:-quiz_db}
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=quiz_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ../../scripts/init-postgres.sh:/docker-entrypoint-initdb.d/init-postgres.sh
+      - quiz-db-data:/var/lib/postgresql/data
+    networks:
+      - quiz-network
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin
+    container_name: quiz-pgadmin
     restart: unless-stopped
     ports:
-      - "8088:80"
+      - "5050:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@admin.com}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+      - PGADMIN_DEFAULT_EMAIL=admin@nosmo.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - pgadmin-data:/var/lib/pgadmin
     depends_on:
-      - postgres
+      - quiz-db
+    networks:
+      - quiz-network
 
 volumes:
-  postgres_data:
-  go-modules:
-  pgadmin_data: 
+  quiz-db-data:
+  pgadmin-data:
+
+networks:
+  quiz-network:
+    driver: bridge 
