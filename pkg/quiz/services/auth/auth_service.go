@@ -23,7 +23,7 @@ type Claims struct {
 // AuthService handles user authentication operations
 type AuthService interface {
 	// Register creates a new user account
-	Register(userDTO *entity.UserDTO) (*entity.User, error)
+	Register(registerDTO *entity.RegisterDTO) (*entity.User, error)
 
 	// Login authenticates a user and returns a JWT token
 	Login(username, password string) (string, error)
@@ -53,9 +53,9 @@ func NewAuthService(userRepo repository.UserRepository, config *config.AuthConfi
 }
 
 // Register creates a new user account
-func (s *authService) Register(userDTO *entity.UserDTO) (*entity.User, error) {
+func (s *authService) Register(registerDTO *entity.RegisterDTO) (*entity.User, error) {
 	// Check if username already exists
-	existingUser, err := s.userRepo.GetByUsername(userDTO.Username)
+	existingUser, err := s.userRepo.GetByUsername(registerDTO.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -66,19 +66,19 @@ func (s *authService) Register(userDTO *entity.UserDTO) (*entity.User, error) {
 	}
 
 	// Hash the password
-	hashedPassword, err := s.HashPassword(userDTO.Password)
+	hashedPassword, err := s.HashPassword(registerDTO.Password)
 	if err != nil {
 		return nil, exception.InternalError("Failed to hash password")
 	}
 
 	// Create user entity
 	user := &entity.User{
-		Name:      userDTO.Name,
-		Username:  userDTO.Username,
+		Name:      registerDTO.Name,
+		Username:  registerDTO.Username,
 		Password:  hashedPassword,
-		Role:      userDTO.Role,
-		Status:    userDTO.Status,
-		BirthDate: userDTO.BirthDate,
+		Role:      registerDTO.Role,
+		Status:    registerDTO.Status,
+		BirthDate: registerDTO.BirthDate,
 	}
 
 	// Save user to repository

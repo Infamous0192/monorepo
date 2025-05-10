@@ -34,7 +34,7 @@ func (h *AuthHandler) RegisterRoutes(app fiber.Router) {
 
 	// Protected routes (authentication required)
 	authMiddleware := middleware.NewAuthMiddleware(h.authService)
-	auth.Get("/profile", authMiddleware.RequireAuth(), h.GetProfile)
+	auth.Get("/verify", authMiddleware.RequireAuth(), h.Verify)
 }
 
 // Register handles user registration requests
@@ -43,7 +43,7 @@ func (h *AuthHandler) RegisterRoutes(app fiber.Router) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body entity.UserDTO true "User registration information"
+// @Param user body entity.RegisterDTO true "User registration information"
 // @Success 201 {object} http.GeneralResponse{data=entity.User}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 409 {object} http.GeneralResponse
@@ -51,13 +51,13 @@ func (h *AuthHandler) RegisterRoutes(app fiber.Router) {
 // @Router /auth/register [post]
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	// Parse request body
-	userDTO := new(entity.UserDTO)
-	if err := h.validation.Body(userDTO, c); err != nil {
+	registerDTO := new(entity.RegisterDTO)
+	if err := h.validation.Body(registerDTO, c); err != nil {
 		return err
 	}
 
 	// Register the user
-	user, err := h.authService.Register(userDTO)
+	user, err := h.authService.Register(registerDTO)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param credentials body object true "Login credentials"
+// @Param credentials body entity.LoginDTO true "Login credentials"
 // @Success 200 {object} http.GeneralResponse{data=map[string]string}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
@@ -84,17 +84,13 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 // @Router /auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	// Parse request body
-	loginRequest := new(struct {
-		Username string `json:"username" validate:"required"`
-		Password string `json:"password" validate:"required"`
-	})
-
-	if err := h.validation.Body(loginRequest, c); err != nil {
+	loginDTO := new(entity.LoginDTO)
+	if err := h.validation.Body(loginDTO, c); err != nil {
 		return err
 	}
 
 	// Login the user
-	token, err := h.authService.Login(loginRequest.Username, loginRequest.Password)
+	token, err := h.authService.Login(loginDTO.Username, loginDTO.Password)
 	if err != nil {
 		return err
 	}
@@ -109,9 +105,9 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	})
 }
 
-// GetProfile returns the current user's profile
-// @Summary Get user profile
-// @Description Get the profile of the currently authenticated user
+// Verify verifies the current user's authentication token
+// @Summary Verify authentication token
+// @Description Verify the current user's authentication token
 // @Tags auth
 // @Accept json
 // @Produce json
@@ -119,8 +115,8 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Security BearerAuth
-// @Router /auth/profile [get]
-func (h *AuthHandler) GetProfile(c *fiber.Ctx) error {
+// @Router /auth/verify [get]
+func (h *AuthHandler) Verify(c *fiber.Ctx) error {
 	// Get user from context (set by middleware)
 	claims, ok := c.Locals("user").(*auth.Claims)
 	if !ok {
@@ -129,7 +125,7 @@ func (h *AuthHandler) GetProfile(c *fiber.Ctx) error {
 
 	return c.JSON(http.GeneralResponse{
 		Status:  fiber.StatusOK,
-		Message: "User profile retrieved",
+		Message: "Token verified successfully",
 		Data:    claims,
 	})
 }

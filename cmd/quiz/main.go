@@ -136,7 +136,7 @@ func main() {
 	questionHandler := handlers.NewQuestionHandler(questionService, validation)
 	answerHandler := handlers.NewAnswerHandler(answerService, validation)
 	submissionHandler := handlers.NewSubmissionHandler(submissionService, validation)
-	userHandler := handlers.NewUserHandler(userService, authService, validation)
+	userHandler := handlers.NewUserHandler(userService, validation)
 	authHandler := handlers.NewAuthHandler(authService, validation)
 
 	// Register article routes

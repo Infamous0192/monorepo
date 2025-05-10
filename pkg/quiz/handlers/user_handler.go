@@ -4,7 +4,6 @@ import (
 	"app/pkg/exception"
 	"app/pkg/quiz/domain/entity"
 	"app/pkg/quiz/middleware"
-	"app/pkg/quiz/services/auth"
 	"app/pkg/quiz/services/user"
 	"app/pkg/types/http"
 	"app/pkg/validation"
@@ -15,15 +14,13 @@ import (
 // UserHandler handles HTTP requests related to user management
 type UserHandler struct {
 	userService user.UserService
-	authService auth.AuthService
 	validation  *validation.Validation
 }
 
 // NewUserHandler creates a new user handler
-func NewUserHandler(userService user.UserService, authService auth.AuthService, validation *validation.Validation) *UserHandler {
+func NewUserHandler(userService user.UserService, validation *validation.Validation) *UserHandler {
 	return &UserHandler{
 		userService: userService,
-		authService: authService,
 		validation:  validation,
 	}
 }
@@ -148,8 +145,8 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Create user (this uses the auth service which handles password hashing)
-	user, err := h.authService.Register(userDTO)
+	// Create user using user service
+	user, err := h.userService.Create(c.Context(), *userDTO)
 	if err != nil {
 		return err
 	}
@@ -189,15 +186,6 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	userDTO := new(entity.UserDTO)
 	if err := h.validation.Body(userDTO, c); err != nil {
 		return err
-	}
-
-	// Hash password if provided
-	if userDTO.Password != "" {
-		hashedPassword, err := h.authService.HashPassword(userDTO.Password)
-		if err != nil {
-			return exception.InternalError("Failed to hash password")
-		}
-		userDTO.Password = hashedPassword
 	}
 
 	// Update user
