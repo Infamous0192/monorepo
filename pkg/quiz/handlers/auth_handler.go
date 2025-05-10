@@ -3,6 +3,7 @@ package handlers
 import (
 	"app/pkg/exception"
 	"app/pkg/quiz/domain/entity"
+	"app/pkg/quiz/middleware"
 	"app/pkg/quiz/services/auth"
 	"app/pkg/types/http"
 	"app/pkg/validation"
@@ -17,11 +18,23 @@ type AuthHandler struct {
 }
 
 // NewAuthHandler creates a new authentication handler
-func NewAuthHandler(authService auth.AuthService) *AuthHandler {
+func NewAuthHandler(authService auth.AuthService, validation *validation.Validation) *AuthHandler {
 	return &AuthHandler{
 		authService: authService,
-		validation:  validation.NewValidation(),
+		validation:  validation,
 	}
+}
+
+// RegisterRoutes registers all routes for authentication handling
+func (h *AuthHandler) RegisterRoutes(app fiber.Router) {
+	// Public routes (no authentication required)
+	auth := app.Group("/auth")
+	auth.Post("/register", h.Register)
+	auth.Post("/login", h.Login)
+
+	// Protected routes (authentication required)
+	authMiddleware := middleware.NewAuthMiddleware(h.authService)
+	auth.Get("/profile", authMiddleware.RequireAuth(), h.GetProfile)
 }
 
 // Register handles user registration requests
@@ -31,8 +44,8 @@ func NewAuthHandler(authService auth.AuthService) *AuthHandler {
 // @Accept json
 // @Produce json
 // @Param user body entity.UserDTO true "User registration information"
-// @Success 201 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 201 {object} http.GeneralResponse{data=entity.User}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 409 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Router /auth/register [post]
@@ -64,8 +77,8 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param credentials body object true "Login credentials"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=map[string]string}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Router /auth/login [post]
@@ -102,7 +115,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=auth.Claims}
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Security BearerAuth

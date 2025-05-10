@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -9,6 +11,7 @@ type QuizConfig struct {
 	App      AppConfig      `yaml:"app" env-prefix:"APP_"`
 	Server   ServerConfig   `yaml:"server" env-prefix:"SERVER_"`
 	Database DatabaseConfig `yaml:"database" env-prefix:"DB_"`
+	Auth     AuthConfig     `yaml:"auth" env-prefix:"AUTH_"`
 }
 
 // AppConfig contains application-specific configuration
@@ -35,4 +38,11 @@ type DatabaseConfig struct {
 	Password string `yaml:"password" env:"PASSWORD" env-default:"postgres"`
 	Name     string `yaml:"name" env:"NAME" env-default:"quiz_db"`
 	SSLMode  string `yaml:"ssl_mode" env:"SSL_MODE" env-default:"disable"`
+}
+
+// AuthConfig holds authentication configuration values
+type AuthConfig struct {
+	JWTSecret        string        `yaml:"secret" env:"SECRET" env-default:"your-jwt-secret-change-me-in-production"`
+	TokenExpiration  time.Duration `yaml:"expiration" env:"EXPIRATION" env-default:"24h"`
+	PasswordHashCost int           `yaml:"hash_cost" env:"HASH_COST" env-default:"10"`
 }

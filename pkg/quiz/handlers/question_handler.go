@@ -3,7 +3,8 @@ package handlers
 import (
 	"app/pkg/exception"
 	"app/pkg/quiz/domain/entity"
-	"app/pkg/quiz/services"
+	"app/pkg/quiz/middleware"
+	"app/pkg/quiz/services/question"
 	"app/pkg/types/http"
 	"app/pkg/validation"
 
@@ -12,16 +13,29 @@ import (
 
 // QuestionHandler handles HTTP requests related to questions
 type QuestionHandler struct {
-	services   *services.Services
-	validation *validation.Validation
+	questionService question.QuestionService
+	validation      *validation.Validation
 }
 
 // NewQuestionHandler creates a new question handler
-func NewQuestionHandler(services *services.Services) *QuestionHandler {
+func NewQuestionHandler(questionService question.QuestionService, validation *validation.Validation) *QuestionHandler {
 	return &QuestionHandler{
-		services:   services,
-		validation: validation.NewValidation(),
+		questionService: questionService,
+		validation:      validation,
 	}
+}
+
+// RegisterRoutes registers all routes for question handling
+func (h *QuestionHandler) RegisterRoutes(app fiber.Router, authMiddleware *middleware.AuthMiddleware) {
+	// Public routes (no authentication required)
+	app.Get("/questions", h.GetQuestions)
+	app.Get("/questions/:id", h.GetQuestion)
+
+	// Protected routes (admin only)
+	protected := app.Group("/questions", authMiddleware.RequireAdmin())
+	protected.Post("/", h.CreateQuestion)
+	protected.Put("/:id", h.UpdateQuestion)
+	protected.Delete("/:id", h.DeleteQuestion)
 }
 
 // GetQuestions retrieves a list of questions with optional filtering and pagination
@@ -34,8 +48,8 @@ func NewQuestionHandler(services *services.Services) *QuestionHandler {
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.Question]}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} http.GeneralResponse
 // @Router /questions [get]
 func (h *QuestionHandler) GetQuestions(c *fiber.Ctx) error {
@@ -54,7 +68,7 @@ func (h *QuestionHandler) GetQuestions(c *fiber.Ctx) error {
 	}
 
 	// Get questions from service
-	result, err := h.services.Question.FindAll(c.Context(), *query)
+	result, err := h.questionService.FindAll(c.Context(), *query)
 	if err != nil {
 		return err
 	}
@@ -74,8 +88,8 @@ func (h *QuestionHandler) GetQuestions(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Question ID"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.Question}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Router /questions/{id} [get]
@@ -87,7 +101,7 @@ func (h *QuestionHandler) GetQuestion(c *fiber.Ctx) error {
 	}
 
 	// Get question from service
-	question, err := h.services.Question.FindOne(c.Context(), uint(id))
+	question, err := h.questionService.FindOne(c.Context(), uint(id))
 	if err != nil {
 		return err
 	}
@@ -112,8 +126,8 @@ func (h *QuestionHandler) GetQuestion(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param question body entity.QuestionDTO true "Question information"
-// @Success 201 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 201 {object} http.GeneralResponse{data=entity.Question}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Security BearerAuth
@@ -126,7 +140,7 @@ func (h *QuestionHandler) CreateQuestion(c *fiber.Ctx) error {
 	}
 
 	// Create question using service
-	question, err := h.services.Question.Create(c.Context(), *questionDTO)
+	question, err := h.questionService.Create(c.Context(), *questionDTO)
 	if err != nil {
 		return err
 	}
@@ -147,8 +161,8 @@ func (h *QuestionHandler) CreateQuestion(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Question ID"
 // @Param question body entity.QuestionDTO true "Updated question information"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.Question}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 404 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
@@ -168,7 +182,7 @@ func (h *QuestionHandler) UpdateQuestion(c *fiber.Ctx) error {
 	}
 
 	// Update question using service
-	question, err := h.services.Question.Update(c.Context(), uint(id), *questionDTO)
+	question, err := h.questionService.Update(c.Context(), uint(id), *questionDTO)
 	if err != nil {
 		return err
 	}
@@ -194,7 +208,7 @@ func (h *QuestionHandler) UpdateQuestion(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Question ID"
 // @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 404 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
@@ -208,7 +222,7 @@ func (h *QuestionHandler) DeleteQuestion(c *fiber.Ctx) error {
 	}
 
 	// Delete question using service
-	if err := h.services.Question.Delete(c.Context(), uint(id)); err != nil {
+	if err := h.questionService.Delete(c.Context(), uint(id)); err != nil {
 		return err
 	}
 

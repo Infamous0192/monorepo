@@ -3,7 +3,9 @@ package handlers
 import (
 	"app/pkg/exception"
 	"app/pkg/quiz/domain/entity"
-	"app/pkg/quiz/services"
+	"app/pkg/quiz/middleware"
+	"app/pkg/quiz/services/auth"
+	"app/pkg/quiz/services/user"
 	"app/pkg/types/http"
 	"app/pkg/validation"
 
@@ -12,16 +14,29 @@ import (
 
 // UserHandler handles HTTP requests related to user management
 type UserHandler struct {
-	services   *services.Services
-	validation *validation.Validation
+	userService user.UserService
+	authService auth.AuthService
+	validation  *validation.Validation
 }
 
 // NewUserHandler creates a new user handler
-func NewUserHandler(services *services.Services) *UserHandler {
+func NewUserHandler(userService user.UserService, authService auth.AuthService, validation *validation.Validation) *UserHandler {
 	return &UserHandler{
-		services:   services,
-		validation: validation.NewValidation(),
+		userService: userService,
+		authService: authService,
+		validation:  validation,
 	}
+}
+
+// RegisterRoutes registers all routes for user handling
+func (h *UserHandler) RegisterRoutes(app fiber.Router, authMiddleware *middleware.AuthMiddleware) {
+	// All user routes require admin access
+	users := app.Group("/users", authMiddleware.RequireAdmin())
+	users.Get("/", h.GetUsers)
+	users.Get("/:id", h.GetUser)
+	users.Post("/", h.CreateUser)
+	users.Put("/:id", h.UpdateUser)
+	users.Delete("/:id", h.DeleteUser)
 }
 
 // GetUsers retrieves a list of users with optional filtering and pagination
@@ -34,10 +49,10 @@ func NewUserHandler(services *services.Services) *UserHandler {
 // @Param role query string false "Filter by role"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.User]}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Security ApiKeyAuth
 // @Router /users [get]
@@ -57,7 +72,7 @@ func (h *UserHandler) GetUsers(c *fiber.Ctx) error {
 	}
 
 	// Get users from service
-	result, err := h.services.User.FindAll(c.Context(), *query)
+	result, err := h.userService.FindAll(c.Context(), *query)
 	if err != nil {
 		return err
 	}
@@ -77,11 +92,11 @@ func (h *UserHandler) GetUsers(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 404 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.User}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Security ApiKeyAuth
 // @Router /users/{id} [get]
@@ -93,7 +108,7 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	}
 
 	// Get user from service
-	user, err := h.services.User.FindOne(c.Context(), uint(id))
+	user, err := h.userService.FindOne(c.Context(), uint(id))
 	if err != nil {
 		return err
 	}
@@ -118,11 +133,11 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param user body entity.UserDTO true "User information"
-// @Success 201 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 409 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 201 {object} http.GeneralResponse{data=entity.User}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 409 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Security ApiKeyAuth
 // @Router /users [post]
@@ -134,7 +149,7 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	// Create user (this uses the auth service which handles password hashing)
-	user, err := h.services.Auth.Register(userDTO)
+	user, err := h.authService.Register(userDTO)
 	if err != nil {
 		return err
 	}
@@ -155,11 +170,11 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "User ID"
 // @Param user body entity.UserDTO true "Updated user information"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 404 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.User}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Security ApiKeyAuth
 // @Router /users/{id} [put]
@@ -178,7 +193,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 
 	// Hash password if provided
 	if userDTO.Password != "" {
-		hashedPassword, err := h.services.Auth.HashPassword(userDTO.Password)
+		hashedPassword, err := h.authService.HashPassword(userDTO.Password)
 		if err != nil {
 			return exception.InternalError("Failed to hash password")
 		}
@@ -186,7 +201,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	}
 
 	// Update user
-	user, err := h.services.User.Update(c.Context(), uint(id), *userDTO)
+	user, err := h.userService.Update(c.Context(), uint(id), *userDTO)
 	if err != nil {
 		return err
 	}
@@ -212,10 +227,10 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "User ID"
 // @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 404 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Security ApiKeyAuth
 // @Router /users/{id} [delete]
@@ -227,7 +242,7 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	}
 
 	// Delete user
-	if err := h.services.User.Delete(c.Context(), uint(id)); err != nil {
+	if err := h.userService.Delete(c.Context(), uint(id)); err != nil {
 		return err
 	}
 

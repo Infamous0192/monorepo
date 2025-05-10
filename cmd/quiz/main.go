@@ -7,8 +7,9 @@ import (
 	"app/pkg/middleware"
 	"app/pkg/quiz/config"
 	"app/pkg/quiz/handlers"
+	authMiddleware "app/pkg/quiz/middleware"
 	quizRepository "app/pkg/quiz/repository/gorm"
-	"app/pkg/quiz/services"
+	quizServices "app/pkg/quiz/services"
 	"app/pkg/validation"
 	"context"
 	"flag"
@@ -98,10 +99,6 @@ func main() {
 		log.Fatalf("Failed to setup article database: %v", err)
 	}
 
-	// Initialize error middleware
-	errorMiddleware := middleware.NewErrorMiddleware()
-	keyMiddleware := middleware.NewKeyMiddleware(cfg.App.APIKey)
-
 	// Initialize quiz repositories
 	quizRepo := quizRepository.NewQuizRepository(db)
 	questionRepo := quizRepository.NewQuestionRepository(db)
@@ -115,19 +112,38 @@ func main() {
 	tagRepo := repository.NewTagRepository(db)
 
 	// Initialize quiz services
-	quizServices := services.NewServices(
-		db,
-		quizRepo,
-		questionRepo,
-		answerRepo,
-		submissionRepo,
-		userRepo,
-	)
+	quizService := quizServices.NewQuizService(quizRepo)
+	questionService := quizServices.NewQuestionService(questionRepo)
+	answerService := quizServices.NewAnswerService(answerRepo)
+	submissionService := quizServices.NewSubmissionService(submissionRepo)
+	userService := quizServices.NewUserService(userRepo)
+	authService := quizServices.NewAuthService(userRepo, &cfg.Auth)
 
 	// Initialize article services
 	articleService := articleServices.NewArticleService(articleRepo, categoryRepo, tagRepo)
 	categoryService := articleServices.NewCategoryService(categoryRepo)
 	tagService := articleServices.NewTagService(tagRepo, articleRepo)
+
+	// Initialize middlewares
+	errorMiddleware := middleware.NewErrorMiddleware()
+	authMiddleware := authMiddleware.NewAuthMiddleware(authService)
+	keyMiddleware := middleware.NewKeyMiddleware(cfg.App.APIKey)
+
+	// Register Plugins
+	validation := validation.NewValidation()
+
+	// Register quiz routes
+	quizHandler := handlers.NewQuizHandler(quizService, validation)
+	questionHandler := handlers.NewQuestionHandler(questionService, validation)
+	answerHandler := handlers.NewAnswerHandler(answerService, validation)
+	submissionHandler := handlers.NewSubmissionHandler(submissionService, validation)
+	userHandler := handlers.NewUserHandler(userService, authService, validation)
+	authHandler := handlers.NewAuthHandler(authService, validation)
+
+	// Register article routes
+	articleHandler := articleHandlers.NewArticleHandler(articleService, validation)
+	categoryHandler := articleHandlers.NewCategoryHandler(categoryService, validation)
+	tagHandler := articleHandlers.NewTagHandler(tagService, validation)
 
 	// Initialize Fiber app with error handler from config
 	app := fiber.New(fiber.Config{
@@ -156,21 +172,18 @@ func main() {
 		})
 	})
 
-	// Register quiz routes
-	handlers.SetupRoutes(app, quizServices)
-
-	// Register Plugins
-	validation := validation.NewValidation()
-
 	// Register article routes
-	articleHandler := articleHandlers.NewArticleHandler(articleService, validation)
-	categoryHandler := articleHandlers.NewCategoryHandler(categoryService, validation)
-	tagHandler := articleHandlers.NewTagHandler(tagService, validation)
-
-	// Set up routes for each handler
 	articleHandler.RegisterRoutes(app, keyMiddleware.ValidateKey())
 	categoryHandler.RegisterRoutes(app, keyMiddleware.ValidateKey())
 	tagHandler.RegisterRoutes(app, keyMiddleware.ValidateKey())
+
+	// Register quiz routes
+	quizHandler.RegisterRoutes(app, authMiddleware)
+	questionHandler.RegisterRoutes(app, authMiddleware)
+	answerHandler.RegisterRoutes(app, authMiddleware)
+	submissionHandler.RegisterRoutes(app, authMiddleware)
+	userHandler.RegisterRoutes(app, authMiddleware)
+	authHandler.RegisterRoutes(app)
 
 	// Start server
 	go func() {

@@ -3,7 +3,8 @@ package handlers
 import (
 	"app/pkg/exception"
 	"app/pkg/quiz/domain/entity"
-	"app/pkg/quiz/services"
+	"app/pkg/quiz/middleware"
+	"app/pkg/quiz/services/quiz"
 	"app/pkg/types/http"
 	"app/pkg/validation"
 
@@ -12,16 +13,29 @@ import (
 
 // QuizHandler handles HTTP requests related to quizzes
 type QuizHandler struct {
-	services   *services.Services
-	validation *validation.Validation
+	quizService quiz.QuizService
+	validation  *validation.Validation
 }
 
 // NewQuizHandler creates a new quiz handler
-func NewQuizHandler(services *services.Services) *QuizHandler {
+func NewQuizHandler(quizService quiz.QuizService, validation *validation.Validation) *QuizHandler {
 	return &QuizHandler{
-		services:   services,
-		validation: validation.NewValidation(),
+		quizService: quizService,
+		validation:  validation,
 	}
+}
+
+// RegisterRoutes registers all routes for quiz handling
+func (h *QuizHandler) RegisterRoutes(app fiber.Router, authMiddleware *middleware.AuthMiddleware) {
+	// Public routes (no authentication required)
+	app.Get("/quizzes", h.GetQuizzes)
+	app.Get("/quizzes/:id", h.GetQuiz)
+
+	// Protected routes (admin only)
+	protected := app.Group("/quizzes", authMiddleware.RequireAdmin())
+	protected.Post("/", h.CreateQuiz)
+	protected.Put("/:id", h.UpdateQuiz)
+	protected.Delete("/:id", h.DeleteQuiz)
 }
 
 // GetQuizzes retrieves a list of quizzes with optional filtering and pagination
@@ -33,8 +47,8 @@ func NewQuizHandler(services *services.Services) *QuizHandler {
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.Quiz]}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} http.GeneralResponse
 // @Router /quizzes [get]
 func (h *QuizHandler) GetQuizzes(c *fiber.Ctx) error {
@@ -53,7 +67,7 @@ func (h *QuizHandler) GetQuizzes(c *fiber.Ctx) error {
 	}
 
 	// Get quizzes from service
-	result, err := h.services.Quiz.FindAll(c.Context(), *query)
+	result, err := h.quizService.FindAll(c.Context(), *query)
 	if err != nil {
 		return err
 	}
@@ -73,10 +87,10 @@ func (h *QuizHandler) GetQuizzes(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Quiz ID"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 404 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.Quiz}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
 // @Router /quizzes/{id} [get]
 func (h *QuizHandler) GetQuiz(c *fiber.Ctx) error {
 	// Parse quiz ID from URL
@@ -86,7 +100,7 @@ func (h *QuizHandler) GetQuiz(c *fiber.Ctx) error {
 	}
 
 	// Get quiz from service
-	quiz, err := h.services.Quiz.FindOne(c.Context(), uint(id))
+	quiz, err := h.quizService.FindOne(c.Context(), uint(id))
 	if err != nil {
 		return err
 	}
@@ -111,8 +125,8 @@ func (h *QuizHandler) GetQuiz(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param quiz body entity.QuizDTO true "Quiz information"
-// @Success 201 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 201 {object} http.GeneralResponse{data=entity.Quiz}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Security BearerAuth
@@ -125,7 +139,7 @@ func (h *QuizHandler) CreateQuiz(c *fiber.Ctx) error {
 	}
 
 	// Create quiz using service
-	quiz, err := h.services.Quiz.Create(c.Context(), *quizDTO)
+	quiz, err := h.quizService.Create(c.Context(), *quizDTO)
 	if err != nil {
 		return err
 	}
@@ -146,8 +160,8 @@ func (h *QuizHandler) CreateQuiz(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Quiz ID"
 // @Param quiz body entity.QuizDTO true "Updated quiz information"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.Quiz}
+// @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 404 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
@@ -167,7 +181,7 @@ func (h *QuizHandler) UpdateQuiz(c *fiber.Ctx) error {
 	}
 
 	// Update quiz using service
-	quiz, err := h.services.Quiz.Update(c.Context(), uint(id), *quizDTO)
+	quiz, err := h.quizService.Update(c.Context(), uint(id), *quizDTO)
 	if err != nil {
 		return err
 	}
@@ -193,7 +207,7 @@ func (h *QuizHandler) UpdateQuiz(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Quiz ID"
 // @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
+// @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 404 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
@@ -207,7 +221,7 @@ func (h *QuizHandler) DeleteQuiz(c *fiber.Ctx) error {
 	}
 
 	// Delete quiz using service
-	if err := h.services.Quiz.Delete(c.Context(), uint(id)); err != nil {
+	if err := h.quizService.Delete(c.Context(), uint(id)); err != nil {
 		return err
 	}
 

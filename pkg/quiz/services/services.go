@@ -9,38 +9,28 @@ import (
 	"app/pkg/quiz/services/quiz"
 	"app/pkg/quiz/services/submission"
 	"app/pkg/quiz/services/user"
-
-	"gorm.io/gorm"
 )
 
-// Services contains all application services
-type Services struct {
-	Quiz       quiz.QuizService
-	Question   question.QuestionService
-	Answer     answer.AnswerService
-	Submission submission.SubmissionService
-	Auth       auth.AuthService
-	User       user.UserService
+func NewAnswerService(answerRepo repository.AnswerRepository) answer.AnswerService {
+	return answer.NewAnswerService(answerRepo)
 }
 
-// NewServices creates and returns all application services
-func NewServices(
-	db *gorm.DB,
-	quizRepo repository.QuizRepository,
-	questionRepo repository.QuestionRepository,
-	answerRepo repository.AnswerRepository,
-	submissionRepo repository.SubmissionRepository,
-	userRepo repository.UserRepository,
-) *Services {
-	// Create auth config
-	authConfig := config.NewAuthConfig()
+func NewQuestionService(questionRepo repository.QuestionRepository) question.QuestionService {
+	return question.NewQuestionService(questionRepo)
+}
 
-	return &Services{
-		Quiz:       quiz.NewQuizService(quizRepo),
-		Question:   question.NewQuestionService(questionRepo),
-		Answer:     answer.NewAnswerService(answerRepo),
-		Submission: submission.NewSubmissionService(submissionRepo),
-		Auth:       auth.NewAuthService(userRepo, authConfig),
-		User:       user.NewUserService(userRepo),
-	}
+func NewQuizService(quizRepo repository.QuizRepository) quiz.QuizService {
+	return quiz.NewQuizService(quizRepo)
+}
+
+func NewSubmissionService(submissionRepo repository.SubmissionRepository) submission.SubmissionService {
+	return submission.NewSubmissionService(submissionRepo)
+}
+
+func NewUserService(userRepo repository.UserRepository) user.UserService {
+	return user.NewUserService(userRepo)
+}
+
+func NewAuthService(userRepo repository.UserRepository, authConfig *config.AuthConfig) auth.AuthService {
+	return auth.NewAuthService(userRepo, authConfig)
 }

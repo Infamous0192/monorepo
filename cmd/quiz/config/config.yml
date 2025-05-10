@@ -16,3 +16,8 @@ database:
   password: postgres
   name: quiz_db
   ssl_mode: disable 
+
+auth:
+  secret: your-jwt-secret-change-me-in-production
+  expiration: 24h
+  hash_cost: 10

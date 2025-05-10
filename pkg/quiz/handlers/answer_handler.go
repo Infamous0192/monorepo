@@ -3,7 +3,8 @@ package handlers
 import (
 	"app/pkg/exception"
 	"app/pkg/quiz/domain/entity"
-	"app/pkg/quiz/services"
+	"app/pkg/quiz/middleware"
+	"app/pkg/quiz/services/answer"
 	"app/pkg/types/http"
 	"app/pkg/validation"
 
@@ -12,16 +13,29 @@ import (
 
 // AnswerHandler handles HTTP requests related to answers
 type AnswerHandler struct {
-	services   *services.Services
-	validation *validation.Validation
+	answerService answer.AnswerService
+	validation    *validation.Validation
 }
 
 // NewAnswerHandler creates a new answer handler
-func NewAnswerHandler(services *services.Services) *AnswerHandler {
+func NewAnswerHandler(answerService answer.AnswerService, validation *validation.Validation) *AnswerHandler {
 	return &AnswerHandler{
-		services:   services,
-		validation: validation.NewValidation(),
+		answerService: answerService,
+		validation:    validation,
 	}
+}
+
+// RegisterRoutes registers all routes for question handling
+func (h *AnswerHandler) RegisterRoutes(app fiber.Router, authMiddleware *middleware.AuthMiddleware) {
+	// Public routes (no authentication required)
+	app.Get("/answers", h.GetAnswers)
+	app.Get("/answers/:id", h.GetAnswer)
+
+	// Protected routes (admin only)
+	protected := app.Group("/answers", authMiddleware.RequireAdmin())
+	protected.Post("/", h.CreateAnswer)
+	protected.Put("/:id", h.UpdateAnswer)
+	protected.Delete("/:id", h.DeleteAnswer)
 }
 
 // GetAnswers retrieves a list of answers with optional filtering and pagination
@@ -55,7 +69,7 @@ func (h *AnswerHandler) GetAnswers(c *fiber.Ctx) error {
 	}
 
 	// Get answers from service
-	result, err := h.services.Answer.FindAll(c.Context(), *query)
+	result, err := h.answerService.FindAll(c.Context(), *query)
 	if err != nil {
 		return err
 	}
@@ -90,7 +104,7 @@ func (h *AnswerHandler) GetAnswer(c *fiber.Ctx) error {
 	}
 
 	// Get answer from service
-	answer, err := h.services.Answer.FindOne(c.Context(), uint(id))
+	answer, err := h.answerService.FindOne(c.Context(), uint(id))
 	if err != nil {
 		return err
 	}
@@ -129,7 +143,7 @@ func (h *AnswerHandler) CreateAnswer(c *fiber.Ctx) error {
 	}
 
 	// Create answer using service
-	answer, err := h.services.Answer.Create(c.Context(), *answerDTO)
+	answer, err := h.answerService.Create(c.Context(), *answerDTO)
 	if err != nil {
 		return err
 	}
@@ -171,7 +185,7 @@ func (h *AnswerHandler) UpdateAnswer(c *fiber.Ctx) error {
 	}
 
 	// Update answer using service
-	answer, err := h.services.Answer.Update(c.Context(), uint(id), *answerDTO)
+	answer, err := h.answerService.Update(c.Context(), uint(id), *answerDTO)
 	if err != nil {
 		return err
 	}
@@ -211,7 +225,7 @@ func (h *AnswerHandler) DeleteAnswer(c *fiber.Ctx) error {
 	}
 
 	// Delete answer using service
-	if err := h.services.Answer.Delete(c.Context(), uint(id)); err != nil {
+	if err := h.answerService.Delete(c.Context(), uint(id)); err != nil {
 		return err
 	}
 

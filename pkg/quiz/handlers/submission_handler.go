@@ -3,7 +3,8 @@ package handlers
 import (
 	"app/pkg/exception"
 	"app/pkg/quiz/domain/entity"
-	"app/pkg/quiz/services"
+	"app/pkg/quiz/middleware"
+	"app/pkg/quiz/services/submission"
 	"app/pkg/types/http"
 	"app/pkg/validation"
 
@@ -12,16 +13,31 @@ import (
 
 // SubmissionHandler handles HTTP requests related to submissions
 type SubmissionHandler struct {
-	services   *services.Services
-	validation *validation.Validation
+	submissionService submission.SubmissionService
+	validation        *validation.Validation
 }
 
 // NewSubmissionHandler creates a new submission handler
-func NewSubmissionHandler(services *services.Services) *SubmissionHandler {
+func NewSubmissionHandler(submissionService submission.SubmissionService, validation *validation.Validation) *SubmissionHandler {
 	return &SubmissionHandler{
-		services:   services,
-		validation: validation.NewValidation(),
+		submissionService: submissionService,
+		validation:        validation,
 	}
+}
+
+// RegisterRoutes registers all routes for submission handling
+func (h *SubmissionHandler) RegisterRoutes(app fiber.Router, authMiddleware *middleware.AuthMiddleware) {
+	// Authenticated user routes
+	authenticated := app.Group("/submissions", authMiddleware.RequireAuth())
+	authenticated.Get("/", h.GetSubmissions)
+	authenticated.Get("/:id", h.GetSubmission)
+	authenticated.Post("/", h.CreateSubmission)
+	authenticated.Post("/bulk", h.CreateBulkSubmissions)
+
+	// Admin only routes
+	admin := app.Group("/submissions", authMiddleware.RequireAdmin())
+	admin.Put("/:id", h.UpdateSubmission)
+	admin.Delete("/:id", h.DeleteSubmission)
 }
 
 // GetSubmissions retrieves a list of submissions with optional filtering and pagination
@@ -34,10 +50,10 @@ func NewSubmissionHandler(services *services.Services) *SubmissionHandler {
 // @Param userId query int false "Filter by user ID"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.Submission]}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Router /submissions [get]
 func (h *SubmissionHandler) GetSubmissions(c *fiber.Ctx) error {
@@ -56,7 +72,7 @@ func (h *SubmissionHandler) GetSubmissions(c *fiber.Ctx) error {
 	}
 
 	// Get submissions from service
-	result, err := h.services.Submission.FindAll(c.Context(), *query)
+	result, err := h.submissionService.FindAll(c.Context(), *query)
 	if err != nil {
 		return err
 	}
@@ -76,11 +92,11 @@ func (h *SubmissionHandler) GetSubmissions(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Submission ID"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 404 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.Submission}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Router /submissions/{id} [get]
 func (h *SubmissionHandler) GetSubmission(c *fiber.Ctx) error {
@@ -91,7 +107,7 @@ func (h *SubmissionHandler) GetSubmission(c *fiber.Ctx) error {
 	}
 
 	// Get submission from service
-	submission, err := h.services.Submission.FindOne(c.Context(), uint(id))
+	submission, err := h.submissionService.FindOne(c.Context(), uint(id))
 	if err != nil {
 		return err
 	}
@@ -116,10 +132,10 @@ func (h *SubmissionHandler) GetSubmission(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param submission body entity.SubmissionDTO true "Submission information"
-// @Success 201 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 201 {object} http.GeneralResponse{data=entity.Submission}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Router /submissions [post]
 func (h *SubmissionHandler) CreateSubmission(c *fiber.Ctx) error {
@@ -130,7 +146,7 @@ func (h *SubmissionHandler) CreateSubmission(c *fiber.Ctx) error {
 	}
 
 	// Create submission using service
-	submission, err := h.services.Submission.Create(c.Context(), *submissionDTO)
+	submission, err := h.submissionService.Create(c.Context(), *submissionDTO)
 	if err != nil {
 		return err
 	}
@@ -150,10 +166,10 @@ func (h *SubmissionHandler) CreateSubmission(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param submissions body entity.SubmissionInsertDTO true "Multiple submission information"
-// @Success 201 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 201 {object} http.GeneralResponse{data=[]entity.Submission}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Router /submissions/bulk [post]
 func (h *SubmissionHandler) CreateBulkSubmissions(c *fiber.Ctx) error {
@@ -169,7 +185,7 @@ func (h *SubmissionHandler) CreateBulkSubmissions(c *fiber.Ctx) error {
 	}
 
 	// Create submissions using service
-	submissions, err := h.services.Submission.CreateBulk(c.Context(), *submissionInsertDTO)
+	submissions, err := h.submissionService.CreateBulk(c.Context(), *submissionInsertDTO)
 	if err != nil {
 		return err
 	}
@@ -190,11 +206,11 @@ func (h *SubmissionHandler) CreateBulkSubmissions(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Submission ID"
 // @Param submission body entity.SubmissionDTO true "Updated submission information"
-// @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 404 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Success 200 {object} http.GeneralResponse{data=entity.Submission}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Router /submissions/{id} [put]
 func (h *SubmissionHandler) UpdateSubmission(c *fiber.Ctx) error {
@@ -211,7 +227,7 @@ func (h *SubmissionHandler) UpdateSubmission(c *fiber.Ctx) error {
 	}
 
 	// Update submission using service
-	submission, err := h.services.Submission.Update(c.Context(), uint(id), *submissionDTO)
+	submission, err := h.submissionService.Update(c.Context(), uint(id), *submissionDTO)
 	if err != nil {
 		return err
 	}
@@ -237,10 +253,10 @@ func (h *SubmissionHandler) UpdateSubmission(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Submission ID"
 // @Success 200 {object} http.GeneralResponse
-// @Failure 400 {object} http.GeneralResponse
-// @Failure 401 {object} http.GeneralResponse
-// @Failure 404 {object} http.GeneralResponse
-// @Failure 500 {object} http.GeneralResponse
+// @Failure 400 {object} validation.ValidationError
+// @Failure 401 {object} error
+// @Failure 404 {object} error
+// @Failure 500 {object} error
 // @Security BearerAuth
 // @Router /submissions/{id} [delete]
 func (h *SubmissionHandler) DeleteSubmission(c *fiber.Ctx) error {
@@ -251,7 +267,7 @@ func (h *SubmissionHandler) DeleteSubmission(c *fiber.Ctx) error {
 	}
 
 	// Delete submission using service
-	if err := h.services.Submission.Delete(c.Context(), uint(id)); err != nil {
+	if err := h.submissionService.Delete(c.Context(), uint(id)); err != nil {
 		return err
 	}
 
