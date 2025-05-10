@@ -702,9 +702,14 @@ paths:
             - $ref: '#/definitions/http.GeneralResponse'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/app_pkg_article_domain_entity.Article'
-                  type: array
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_article_domain_entity.Article'
+                        type: array
+                    type: object
               type: object
         "400":
           description: Bad Request
@@ -1012,9 +1017,14 @@ paths:
             - $ref: '#/definitions/http.GeneralResponse'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/app_pkg_article_domain_entity.Category'
-                  type: array
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+                        type: array
+                    type: object
               type: object
         "400":
           description: Bad Request
@@ -2012,9 +2022,14 @@ paths:
             - $ref: '#/definitions/http.GeneralResponse'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
-                  type: array
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+                        type: array
+                    type: object
               type: object
         "400":
           description: Bad Request

@@ -421,10 +421,22 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/app_pkg_article_domain_entity.Article"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/http.PaginatedResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "result": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/app_pkg_article_domain_entity.Article"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -924,10 +936,22 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/app_pkg_article_domain_entity.Category"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/http.PaginatedResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "result": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/app_pkg_article_domain_entity.Category"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -2547,10 +2571,22 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/app_pkg_article_domain_entity.Tag"
-                                            }
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/http.PaginatedResponse"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "result": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/definitions/app_pkg_article_domain_entity.Tag"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
