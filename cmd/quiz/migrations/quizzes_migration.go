@@ -1,4 +1,4 @@
-package main
+package migrations
 
 import (
 	"app/pkg/quiz/domain/entity"
@@ -9,8 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// setupQuizDatabase initializes the quiz database and runs migrations
-func setupQuizDatabase(db *gorm.DB) error {
+// SetupQuizDatabase initializes the quiz database and runs migrations
+func SetupQuizDatabase(db *gorm.DB) error {
 	// Auto migrate quiz entities
 	err := db.AutoMigrate(
 		// Quiz entities

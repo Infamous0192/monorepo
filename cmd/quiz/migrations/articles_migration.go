@@ -1,4 +1,4 @@
-package main
+package migrations
 
 import (
 	"app/pkg/article/domain/entity"
@@ -8,8 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// setupArticleDatabase initializes the article database and runs migrations
-func setupArticleDatabase(db *gorm.DB) error {
+// SetupArticleDatabase initializes the article database and runs migrations
+func SetupArticleDatabase(db *gorm.DB) error {
 	// Auto migrate article entities
 	err := db.AutoMigrate(
 		// Article entities

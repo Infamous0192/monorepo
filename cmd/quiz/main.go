@@ -29,6 +29,7 @@ import (
 	"gorm.io/gorm"
 
 	_ "app/cmd/quiz/docs" // Import generated swagger docs
+	"app/cmd/quiz/migrations"
 )
 
 // @title Quiz API
@@ -56,7 +57,6 @@ import (
 // @in header
 // @name Authorization
 // @description JWT authorization with Bearer prefix
-
 func main() {
 	var cfg config.QuizConfig
 	var configPath = flag.String("config", filepath.Join("cmd", "quiz", "config", "config.yml"), "path to config file")
@@ -89,12 +89,12 @@ func main() {
 	}
 
 	// Setup quiz database (migrations)
-	if err := setupQuizDatabase(db); err != nil {
+	if err := migrations.SetupQuizDatabase(db); err != nil {
 		log.Fatalf("Failed to setup quiz database: %v", err)
 	}
 
 	// Setup article database (migrations)
-	if err := setupArticleDatabase(db); err != nil {
+	if err := migrations.SetupArticleDatabase(db); err != nil {
 		log.Fatalf("Failed to setup article database: %v", err)
 	}
 
