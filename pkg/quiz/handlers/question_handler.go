@@ -48,7 +48,7 @@ func (h *QuestionHandler) RegisterRoutes(app fiber.Router, authMiddleware *middl
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.Question]}
+// @Success 200 {object} http.GeneralResponse{data=http.PaginatedResponse{result=[]entity.Question}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} http.GeneralResponse
 // @Router /questions [get]

@@ -1,6 +1,7 @@
 package validation
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -10,8 +11,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Validation handles request validation
 type Validation struct {
-	*validator.Validate
+	validate *validator.Validate
 }
 
 // ValidationError represents validation errors
@@ -63,8 +65,11 @@ func getErrorMessage(tag string) string {
 	}
 }
 
+// NewValidation creates a new validation instance
 func NewValidation() *Validation {
-	return &Validation{validate}
+	return &Validation{
+		validate: validator.New(),
+	}
 }
 
 // Body parses the request body into a given struct and validates it.
@@ -113,7 +118,7 @@ func (v *Validation) ParamsInt(ctx *fiber.Ctx, keys ...string) (int, error) {
 }
 
 func (v *Validation) Field(field interface{}, tag string) error {
-	if err := v.Var(field, tag); err != nil {
+	if err := v.validate.Var(field, tag); err != nil {
 		return fmt.Errorf("%v", getMessage(err.(validator.FieldError)))
 	}
 
@@ -122,7 +127,7 @@ func (v *Validation) Field(field interface{}, tag string) error {
 
 // ValidateStruct validates a given struct and returns a map of validation errors.
 func (v *Validation) ValidateStruct(values interface{}) error {
-	if err := v.Struct(values); err != nil {
+	if err := v.validate.Struct(values); err != nil {
 		st := reflect.Indirect(reflect.ValueOf(values)).Type() // Get indirect type
 		messages := make(map[string]string)
 
@@ -169,4 +174,32 @@ func getMessage(err validator.FieldError) string {
 	}
 
 	return b.String()
+}
+
+// FormValue validates and binds form field value to struct
+func (v *Validation) FormValue(obj interface{}, field string, c *fiber.Ctx) error {
+	// Get form field value
+	value := c.FormValue(field)
+	if value == "" {
+		return fmt.Errorf("form field '%s' is required", field)
+	}
+
+	// Parse JSON value
+	if err := json.Unmarshal([]byte(value), obj); err != nil {
+		return fmt.Errorf("invalid JSON in form field '%s': %v", field, err)
+	}
+
+	// Validate struct
+	if err := v.validate.Struct(obj); err != nil {
+		if validationErrors, ok := err.(validator.ValidationErrors); ok {
+			errorMap := make(map[string]string)
+			for _, e := range validationErrors {
+				errorMap[e.Field()] = fmt.Sprintf("validation failed on '%s' tag", e.Tag())
+			}
+			return ValidationError{Errors: errorMap}
+		}
+		return err
+	}
+
+	return nil
 }

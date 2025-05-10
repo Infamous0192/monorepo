@@ -53,7 +53,7 @@ func (h *TagHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Handler
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse{data=[]entity.Tag}
+// @Success 200 {object} http.GeneralResponse{data=http.PaginatedResponse{result=[]entity.Tag}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} error
 // @Router /tags [get]
@@ -90,9 +90,9 @@ func (h *TagHandler) GetTags(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
 		Status:  fiber.StatusOK,
 		Message: "Tags retrieved successfully",
-		Data: fiber.Map{
-			"metadata": meta,
-			"result":   tags,
+		Data: pagination.PaginatedResult[entity.Tag]{
+			Metadata: meta,
+			Result:   tags,
 		},
 	})
 }

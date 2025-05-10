@@ -54,7 +54,7 @@ func (h *CategoryHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Ha
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse{data=[]entity.Category}
+// @Success 200 {object} http.GeneralResponse{data=http.PaginatedResponse{result=[]entity.Category}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} error
 // @Router /categories [get]
@@ -91,9 +91,9 @@ func (h *CategoryHandler) GetCategories(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
 		Status:  fiber.StatusOK,
 		Message: "Categories retrieved successfully",
-		Data: fiber.Map{
-			"metadata": meta,
-			"result":   categories,
+		Data: pagination.PaginatedResult[entity.Category]{
+			Metadata: meta,
+			Result:   categories,
 		},
 	})
 }

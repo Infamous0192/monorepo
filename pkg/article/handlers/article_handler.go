@@ -62,7 +62,7 @@ func (h *ArticleHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Han
 // @Param published query boolean false "Filter by published status"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse{data=[]entity.Article}
+// @Success 200 {object} http.GeneralResponse{data=http.PaginatedResponse{result=[]entity.Article}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} error
 // @Router /articles [get]
@@ -105,9 +105,9 @@ func (h *ArticleHandler) GetArticles(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
 		Status:  fiber.StatusOK,
 		Message: "Articles retrieved successfully",
-		Data: fiber.Map{
-			"metadata": meta,
-			"result":   articles,
+		Data: pagination.PaginatedResult[entity.Article]{
+			Metadata: meta,
+			Result:   articles,
 		},
 	})
 }

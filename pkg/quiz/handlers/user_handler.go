@@ -46,7 +46,7 @@ func (h *UserHandler) RegisterRoutes(app fiber.Router, authMiddleware *middlewar
 // @Param role query string false "Filter by role"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.User]}
+// @Success 200 {object} http.GeneralResponse{data=http.PaginatedResponse{result=[]entity.User}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 500 {object} error

@@ -1,5 +1,7 @@
 package http
 
+import "app/pkg/types/pagination"
+
 // GeneralResponse represents a standard API response
 type GeneralResponse struct {
 	Status  int    `json:"status"`
@@ -15,7 +17,6 @@ type ErrorResponse struct {
 }
 
 type PaginatedResponse struct {
-	Status  int    `json:"status"`
-	Message string `json:"message,omitempty"`
-	Data    any    `json:"data"`
+	Metadata pagination.Metadata `json:"metadata"`
+	Result   []interface{}       `json:"result"`
 }

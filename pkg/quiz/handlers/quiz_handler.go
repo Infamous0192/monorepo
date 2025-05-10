@@ -47,7 +47,7 @@ func (h *QuizHandler) RegisterRoutes(app fiber.Router, authMiddleware *middlewar
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.Quiz]}
+// @Success 200 {object} http.GeneralResponse{data=http.PaginatedResponse{result=[]entity.Quiz}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} http.GeneralResponse
 // @Router /quizzes [get]

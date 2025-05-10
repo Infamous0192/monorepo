@@ -50,7 +50,7 @@ func (h *SubmissionHandler) RegisterRoutes(app fiber.Router, authMiddleware *mid
 // @Param userId query int false "Filter by user ID"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} http.GeneralResponse{data=pagination.PaginatedResult[entity.Submission]}
+// @Success 200 {object} http.GeneralResponse{data=http.PaginatedResponse{result=[]entity.Submission}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 500 {object} error
