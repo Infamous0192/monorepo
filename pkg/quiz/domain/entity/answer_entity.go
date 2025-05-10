@@ -22,7 +22,7 @@ type Answer struct {
 type AnswerDTO struct {
 	Text     string `json:"text" form:"text" validate:"required"`
 	Value    *int32 `json:"value" form:"value" validate:"required"`
-	Question uint   `json:"question" form:"question" validate:"omitempty,exist=questions"`
+	Question uint   `json:"question" form:"question" validate:"omitempty"`
 }
 
 // AnswerQuery represents the query parameters for filtering answers
