@@ -28,7 +28,7 @@ func NewTagHandler(
 }
 
 // RegisterRoutes registers all routes for tag handling
-func (h *TagHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.Handler) {
+func (h *TagHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Handler) {
 	api := app.Group("/api/tags")
 
 	// Public routes (no API key required)
@@ -38,7 +38,7 @@ func (h *TagHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.Handl
 	api.Get("/article/:articleId", h.GetTagsByArticle)
 
 	// Protected routes (API key required)
-	protected := api.Use(apiKeyMiddleware)
+	protected := api.Use(authMiddleware)
 	protected.Post("/", h.CreateTag)
 	protected.Put("/:id", h.UpdateTag)
 	protected.Delete("/:id", h.DeleteTag)

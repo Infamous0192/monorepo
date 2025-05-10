@@ -28,7 +28,7 @@ func NewArticleHandler(
 }
 
 // RegisterRoutes registers all routes for article handling
-func (h *ArticleHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.Handler) {
+func (h *ArticleHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Handler) {
 	api := app.Group("/api/articles")
 
 	// Public routes (no API key required)
@@ -36,7 +36,7 @@ func (h *ArticleHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.H
 	api.Get("/:id", h.GetArticle)
 
 	// Protected routes (API key required)
-	protected := api.Use(apiKeyMiddleware)
+	protected := api.Use(authMiddleware)
 	protected.Post("/", h.CreateArticle)
 	protected.Put("/:id", h.UpdateArticle)
 	protected.Delete("/:id", h.DeleteArticle)

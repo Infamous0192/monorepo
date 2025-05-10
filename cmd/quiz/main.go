@@ -127,7 +127,6 @@ func main() {
 	// Initialize middlewares
 	errorMiddleware := middleware.NewErrorMiddleware()
 	authMiddleware := authMiddleware.NewAuthMiddleware(authService)
-	keyMiddleware := middleware.NewKeyMiddleware(cfg.App.APIKey)
 
 	// Register Plugins
 	validation := validation.NewValidation()
@@ -173,9 +172,9 @@ func main() {
 	})
 
 	// Register article routes
-	articleHandler.RegisterRoutes(app, keyMiddleware.ValidateKey())
-	categoryHandler.RegisterRoutes(app, keyMiddleware.ValidateKey())
-	tagHandler.RegisterRoutes(app, keyMiddleware.ValidateKey())
+	articleHandler.RegisterRoutes(app, authMiddleware.RequireAdmin())
+	categoryHandler.RegisterRoutes(app, authMiddleware.RequireAdmin())
+	tagHandler.RegisterRoutes(app, authMiddleware.RequireAdmin())
 
 	// Register quiz routes
 	quizHandler.RegisterRoutes(app, authMiddleware)
