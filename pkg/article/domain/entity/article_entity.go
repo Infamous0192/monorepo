@@ -12,6 +12,8 @@ type Article struct {
 	Content     string     `json:"content"` // HTML content
 	Slug        string     `json:"slug" gorm:"uniqueIndex"`
 	PublishedAt *time.Time `json:"publishedAt,omitempty" gorm:"column:published_at"`
+	ThumbnailID *uint      `json:"thumbnailId,omitempty"`
+	Thumbnail   *File      `json:"thumbnail,omitempty" gorm:"foreignKey:ThumbnailID"`
 
 	Categories []*Category `json:"categories,omitempty" gorm:"many2many:article_categories;"`
 	Tags       []*Tag      `json:"tags,omitempty" gorm:"many2many:article_tags;"`
@@ -28,6 +30,7 @@ type ArticleDTO struct {
 	PublishedAt *time.Time `json:"publishedAt,omitempty"`
 	CategoryIDs []uint     `json:"categoryIds,omitempty"`
 	TagIDs      []uint     `json:"tagIds,omitempty"`
+	ThumbnailID *uint      `json:"thumbnailId,omitempty"`
 }
 
 // ArticleQuery represents the query parameters for filtering articles

@@ -13,7 +13,7 @@ type Tag struct {
 	Slug        string `json:"slug" gorm:"uniqueIndex"`
 
 	// Many-to-many relationship with articles
-	Articles []*Article `json:"articles,omitempty" gorm:"many2many:article_tags;"`
+	Articles []*Article `json:"-" gorm:"many2many:article_tags;"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`

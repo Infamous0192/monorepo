@@ -2,10 +2,15 @@ package handlers
 
 import (
 	"app/pkg/article/domain/entity"
+	"app/pkg/article/domain/repository"
 	"app/pkg/article/domain/service"
+	"app/pkg/exception"
 	"app/pkg/types/http"
 	"app/pkg/types/pagination"
 	"app/pkg/validation"
+	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -13,16 +18,19 @@ import (
 // ArticleHandler handles HTTP requests related to articles
 type ArticleHandler struct {
 	articleService service.ArticleService
+	fileRepo       repository.FileRepository
 	validation     *validation.Validation
 }
 
 // NewArticleHandler creates a new article handler
 func NewArticleHandler(
 	articleService service.ArticleService,
+	fileRepo repository.FileRepository,
 	validation *validation.Validation,
 ) *ArticleHandler {
 	return &ArticleHandler{
 		articleService: articleService,
+		fileRepo:       fileRepo,
 		validation:     validation,
 	}
 }
@@ -34,6 +42,7 @@ func (h *ArticleHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Han
 	// Public routes (no API key required)
 	api.Get("/", h.GetArticles)
 	api.Get("/:id", h.GetArticle)
+	api.Get("/files/:filename", h.ServeFile)
 
 	// Protected routes (API key required)
 	protected := api.Use(authMiddleware)
@@ -153,8 +162,43 @@ func (h *ArticleHandler) GetArticle(c *fiber.Ctx) error {
 func (h *ArticleHandler) CreateArticle(c *fiber.Ctx) error {
 	var dto entity.ArticleDTO
 
-	if err := h.validation.Body(&dto, c); err != nil {
+	// Parse article data from form field
+	if err := h.validation.FormValue(&dto, "article", c); err != nil {
 		return err
+	}
+
+	// Handle thumbnail upload if provided
+	if file, err := c.FormFile("thumbnail"); err == nil && file != nil {
+		// Validate file type
+		if !isValidImageType(file.Header.Get("Content-Type")) {
+			return validation.ValidationError{
+				Errors: map[string]string{
+					"thumbnail": "Invalid file type. Only images are allowed.",
+				},
+			}
+		}
+
+		// Open file
+		src, err := file.Open()
+		if err != nil {
+			return exception.InternalError(fmt.Sprintf("Failed to open uploaded file: %v", err))
+		}
+		defer src.Close()
+
+		// Store file
+		fileEntity, err := h.fileRepo.Store(
+			c.Context(),
+			file.Filename,
+			file.Header.Get("Content-Type"),
+			file.Size,
+			src,
+		)
+		if err != nil {
+			return err
+		}
+
+		// Set thumbnail ID
+		dto.ThumbnailID = &fileEntity.ID
 	}
 
 	article, err := h.articleService.Create(c.Context(), dto)
@@ -191,8 +235,44 @@ func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
 	}
 
 	var dto entity.ArticleDTO
-	if err := h.validation.Body(&dto, c); err != nil {
+
+	// Parse article data from form field
+	if err := h.validation.FormValue(&dto, "article", c); err != nil {
 		return err
+	}
+
+	// Handle thumbnail upload if provided
+	if file, err := c.FormFile("thumbnail"); err == nil && file != nil {
+		// Validate file type
+		if !isValidImageType(file.Header.Get("Content-Type")) {
+			return validation.ValidationError{
+				Errors: map[string]string{
+					"thumbnail": "Invalid file type. Only images are allowed.",
+				},
+			}
+		}
+
+		// Open file
+		src, err := file.Open()
+		if err != nil {
+			return exception.InternalError(fmt.Sprintf("Failed to open uploaded file: %v", err))
+		}
+		defer src.Close()
+
+		// Store file
+		fileEntity, err := h.fileRepo.Store(
+			c.Context(),
+			file.Filename,
+			file.Header.Get("Content-Type"),
+			file.Size,
+			src,
+		)
+		if err != nil {
+			return err
+		}
+
+		// Set thumbnail ID
+		dto.ThumbnailID = &fileEntity.ID
 	}
 
 	article, err := h.articleService.Update(c.Context(), uint(id), dto)
@@ -235,4 +315,33 @@ func (h *ArticleHandler) DeleteArticle(c *fiber.Ctx) error {
 		Status:  fiber.StatusOK,
 		Message: "Article deleted successfully",
 	})
+}
+
+// ServeFile serves uploaded files
+func (h *ArticleHandler) ServeFile(c *fiber.Ctx) error {
+	filename := c.Params("filename")
+	if filename == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "Filename is required")
+	}
+
+	// Get file path from upload directory
+	filePath := filepath.Join("uploads", filename) // Make sure this matches your upload directory
+
+	// Check if file exists
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return fiber.NewError(fiber.StatusNotFound, "File not found")
+	}
+
+	return c.SendFile(filePath)
+}
+
+// isValidImageType checks if the content type is a valid image type
+func isValidImageType(contentType string) bool {
+	validTypes := map[string]bool{
+		"image/jpeg": true,
+		"image/png":  true,
+		"image/gif":  true,
+		"image/webp": true,
+	}
+	return validTypes[contentType]
 }

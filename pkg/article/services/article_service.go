@@ -17,6 +17,7 @@ type articleService struct {
 	articleRepo  repository.ArticleRepository
 	categoryRepo repository.CategoryRepository
 	tagRepo      repository.TagRepository
+	fileRepo     repository.FileRepository
 }
 
 // NewArticleService creates a new article service
@@ -24,11 +25,13 @@ func NewArticleService(
 	articleRepo repository.ArticleRepository,
 	categoryRepo repository.CategoryRepository,
 	tagRepo repository.TagRepository,
+	fileRepo repository.FileRepository,
 ) service.ArticleService {
 	return &articleService{
 		articleRepo:  articleRepo,
 		categoryRepo: categoryRepo,
 		tagRepo:      tagRepo,
+		fileRepo:     fileRepo,
 	}
 }
 
@@ -168,6 +171,20 @@ func (s *articleService) Update(ctx context.Context, id uint, dto entity.Article
 
 // Delete removes an article
 func (s *articleService) Delete(ctx context.Context, id uint) error {
+	// Get article first to check if it has a thumbnail
+	article, err := s.articleRepo.FindOne(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	// Delete thumbnail if exists
+	if article.ThumbnailID != nil {
+		if err := s.fileRepo.Delete(ctx, *article.ThumbnailID); err != nil {
+			return err
+		}
+	}
+
+	// Delete article
 	return s.articleRepo.Delete(ctx, id)
 }
 

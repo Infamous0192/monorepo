@@ -1,5 +1,35 @@
 basePath: /api
 definitions:
+  app_pkg_article_domain_entity.Article:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+        type: array
+      content:
+        description: HTML content
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      publishedAt:
+        type: string
+      slug:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+        type: array
+      thumbnail:
+        $ref: '#/definitions/app_pkg_article_domain_entity.File'
+      thumbnailId:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   app_pkg_article_domain_entity.ArticleDTO:
     properties:
       categoryIds:
@@ -16,11 +46,31 @@ definitions:
         items:
           type: integer
         type: array
+      thumbnailId:
+        type: integer
       title:
         type: string
     required:
     - content
     - title
+    type: object
+  app_pkg_article_domain_entity.Category:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      parentId:
+        description: Self-referencing relationship for nested categories
+        type: integer
+      slug:
+        type: string
+      updatedAt:
+        type: string
     type: object
   app_pkg_article_domain_entity.CategoryDTO:
     properties:
@@ -35,6 +85,38 @@ definitions:
     required:
     - name
     type: object
+  app_pkg_article_domain_entity.File:
+    properties:
+      contentType:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  app_pkg_article_domain_entity.Tag:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+      updatedAt:
+        type: string
+    type: object
   app_pkg_article_domain_entity.TagDTO:
     properties:
       description:
@@ -45,6 +127,21 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  app_pkg_quiz_domain_entity.Answer:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      question:
+        $ref: '#/definitions/app_pkg_quiz_domain_entity.Question'
+      text:
+        type: string
+      updatedAt:
+        type: string
+      value:
+        type: integer
     type: object
   app_pkg_quiz_domain_entity.AnswerDTO:
     properties:
@@ -58,6 +155,31 @@ definitions:
     - text
     - value
     type: object
+  app_pkg_quiz_domain_entity.LoginDTO:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  app_pkg_quiz_domain_entity.Option:
+    properties:
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      isCorrect:
+        type: boolean
+      questionId:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
   app_pkg_quiz_domain_entity.OptionDTO:
     properties:
       content:
@@ -66,6 +188,27 @@ definitions:
         type: boolean
     required:
     - content
+    type: object
+  app_pkg_quiz_domain_entity.Question:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.Answer'
+        type: array
+      content:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      options:
+        items:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.Option'
+        type: array
+      quizId:
+        type: integer
+      updatedAt:
+        type: string
     type: object
   app_pkg_quiz_domain_entity.QuestionDTO:
     properties:
@@ -85,6 +228,23 @@ definitions:
     - content
     - quizId
     type: object
+  app_pkg_quiz_domain_entity.Quiz:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      questions:
+        items:
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.Question'
+        type: array
+      updatedAt:
+        type: string
+    type: object
   app_pkg_quiz_domain_entity.QuizDTO:
     properties:
       description:
@@ -93,6 +253,46 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  app_pkg_quiz_domain_entity.RegisterDTO:
+    properties:
+      birthDate:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        enum:
+        - admin
+        - user
+        type: string
+      status:
+        type: boolean
+      username:
+        type: string
+    required:
+    - birthDate
+    - name
+    - password
+    - role
+    - status
+    - username
+    type: object
+  app_pkg_quiz_domain_entity.Submission:
+    properties:
+      answer:
+        $ref: '#/definitions/app_pkg_quiz_domain_entity.Answer'
+      createdAt:
+        type: string
+      id:
+        type: integer
+      question:
+        $ref: '#/definitions/app_pkg_quiz_domain_entity.Question'
+      quiz:
+        $ref: '#/definitions/app_pkg_quiz_domain_entity.Quiz'
+      updatedAt:
+        type: string
     type: object
   app_pkg_quiz_domain_entity.SubmissionDTO:
     properties:
@@ -119,6 +319,25 @@ definitions:
     required:
     - data
     type: object
+  app_pkg_quiz_domain_entity.User:
+    properties:
+      birthDate:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+      status:
+        type: boolean
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
   app_pkg_quiz_domain_entity.UserDTO:
     properties:
       birthDate:
@@ -141,8 +360,40 @@ definitions:
     - status
     - username
     type: object
-  fiber.Map:
-    additionalProperties: true
+  app_pkg_quiz_services_auth.Claims:
+    properties:
+      aud:
+        description: the `aud` (Audience) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3
+        items:
+          type: string
+        type: array
+      exp:
+        allOf:
+        - $ref: '#/definitions/jwt.NumericDate'
+        description: the `exp` (Expiration Time) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4
+      iat:
+        allOf:
+        - $ref: '#/definitions/jwt.NumericDate'
+        description: the `iat` (Issued At) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6
+      iss:
+        description: the `iss` (Issuer) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1
+        type: string
+      jti:
+        description: the `jti` (JWT ID) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7
+        type: string
+      nbf:
+        allOf:
+        - $ref: '#/definitions/jwt.NumericDate'
+        description: the `nbf` (Not Before) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5
+      role:
+        type: string
+      sub:
+        description: the `sub` (Subject) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2
+        type: string
+      userId:
+        type: integer
+      username:
+        type: string
     type: object
   http.GeneralResponse:
     properties:
@@ -150,6 +401,34 @@ definitions:
       message:
         type: string
       status:
+        type: integer
+    type: object
+  http.PaginatedResponse:
+    properties:
+      metadata:
+        $ref: '#/definitions/pagination.Metadata'
+      result:
+        items: {}
+        type: array
+    type: object
+  jwt.NumericDate:
+    properties:
+      time.Time:
+        type: string
+    type: object
+  pagination.Metadata:
+    properties:
+      count:
+        type: integer
+      hasNext:
+        type: boolean
+      hasPrev:
+        type: boolean
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
         type: integer
     type: object
   validation.ValidationError:
@@ -199,7 +478,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_quiz_domain_entity.Answer'
+                        type: array
+                    type: object
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -407,7 +698,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/app_pkg_article_domain_entity.Article'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -435,7 +733,12 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Article'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -468,7 +771,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            $ref: '#/definitions/http.GeneralResponse'
         "400":
           description: Bad Request
           schema:
@@ -485,36 +788,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Delete an article
-      tags:
-      - articles
-    get:
-      consumes:
-      - application/json
-      description: Get details of a specific article by its ID
-      parameters:
-      - description: Article ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/fiber.Map'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/validation.ValidationError'
-        "404":
-          description: Not Found
-          schema: {}
-        "500":
-          description: Internal Server Error
-          schema: {}
-      summary: Get article by ID
       tags:
       - articles
     put:
@@ -539,7 +812,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Article'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -558,79 +836,7 @@ paths:
       summary: Update an existing article
       tags:
       - articles
-  /articles/{id}/publish:
-    post:
-      consumes:
-      - application/json
-      description: Change the status of an article to published
-      parameters:
-      - description: Article ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/fiber.Map'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/validation.ValidationError'
-        "401":
-          description: Unauthorized
-          schema: {}
-        "404":
-          description: Not Found
-          schema: {}
-        "500":
-          description: Internal Server Error
-          schema: {}
-      security:
-      - ApiKeyAuth: []
-      summary: Publish an article
-      tags:
-      - articles
-  /articles/{id}/unpublish:
-    post:
-      consumes:
-      - application/json
-      description: Change the status of an article to unpublished
-      parameters:
-      - description: Article ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/fiber.Map'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/validation.ValidationError'
-        "401":
-          description: Unauthorized
-          schema: {}
-        "404":
-          description: Not Found
-          schema: {}
-        "500":
-          description: Internal Server Error
-          schema: {}
-      security:
-      - ApiKeyAuth: []
-      summary: Unpublish an article
-      tags:
-      - articles
-  /articles/slug/{slug}:
+  /articles/{slug}:
     get:
       consumes:
       - application/json
@@ -647,7 +853,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Article'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -672,18 +883,25 @@ paths:
         name: credentials
         required: true
         schema:
-          type: object
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.LoginDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  additionalProperties:
+                    type: string
+                  type: object
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
           schema:
@@ -693,31 +911,6 @@ paths:
           schema:
             $ref: '#/definitions/http.GeneralResponse'
       summary: Login a user
-      tags:
-      - auth
-  /auth/profile:
-    get:
-      consumes:
-      - application/json
-      description: Get the profile of the currently authenticated user
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
-      security:
-      - BearerAuth: []
-      summary: Get user profile
       tags:
       - auth
   /auth/register:
@@ -731,18 +924,23 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/app_pkg_quiz_domain_entity.UserDTO'
+          $ref: '#/definitions/app_pkg_quiz_domain_entity.RegisterDTO'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "409":
           description: Conflict
           schema:
@@ -752,6 +950,36 @@ paths:
           schema:
             $ref: '#/definitions/http.GeneralResponse'
       summary: Register a new user
+      tags:
+      - auth
+  /auth/verify:
+    get:
+      consumes:
+      - application/json
+      description: Verify the current user's authentication token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_services_auth.Claims'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.GeneralResponse'
+      security:
+      - BearerAuth: []
+      summary: Verify authentication token
       tags:
       - auth
   /categories:
@@ -780,7 +1008,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -808,7 +1043,12 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -841,7 +1081,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            $ref: '#/definitions/http.GeneralResponse'
         "400":
           description: Bad Request
           schema:
@@ -876,7 +1116,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -912,7 +1157,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -948,7 +1198,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -979,7 +1236,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1010,7 +1272,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Category'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1054,11 +1321,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_quiz_domain_entity.Question'
+                        type: array
+                    type: object
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "500":
           description: Internal Server Error
           schema:
@@ -1083,11 +1362,16 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Question'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
           schema:
@@ -1122,7 +1406,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
           schema:
@@ -1156,11 +1440,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Question'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "404":
           description: Not Found
           schema:
@@ -1194,11 +1483,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Question'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
           schema:
@@ -1242,11 +1536,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_quiz_domain_entity.Quiz'
+                        type: array
+                    type: object
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "500":
           description: Internal Server Error
           schema:
@@ -1271,11 +1577,16 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Quiz'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
           schema:
@@ -1310,7 +1621,7 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
           schema:
@@ -1344,19 +1655,22 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Quiz'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       summary: Get quiz by ID
       tags:
       - quizzes
@@ -1382,11 +1696,16 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Quiz'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
           schema:
@@ -1434,19 +1753,29 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_quiz_domain_entity.Submission'
+                        type: array
+                    type: object
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       summary: Get all submissions
@@ -1469,19 +1798,22 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Submission'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       summary: Create a new submission
@@ -1508,19 +1840,16 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       summary: Delete a submission
@@ -1542,23 +1871,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Submission'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       summary: Get submission by ID
@@ -1586,23 +1917,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.Submission'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       summary: Update an existing submission
@@ -1626,19 +1959,24 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/app_pkg_quiz_domain_entity.Submission'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       summary: Create multiple submissions
@@ -1670,7 +2008,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1698,7 +2043,12 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1731,7 +2081,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            $ref: '#/definitions/http.GeneralResponse'
         "400":
           description: Bad Request
           schema:
@@ -1766,7 +2116,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1802,7 +2157,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1838,7 +2198,14 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+                  type: array
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1869,7 +2236,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/fiber.Map'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Tag'
+              type: object
         "400":
           description: Bad Request
           schema:
@@ -1913,19 +2285,29 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/http.PaginatedResponse'
+                  - properties:
+                      result:
+                        items:
+                          $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+                        type: array
+                    type: object
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       - ApiKeyAuth: []
@@ -1949,23 +2331,25 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "409":
           description: Conflict
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       - ApiKeyAuth: []
@@ -1993,19 +2377,16 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       - ApiKeyAuth: []
@@ -2028,23 +2409,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       - ApiKeyAuth: []
@@ -2073,23 +2456,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+              type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/http.GeneralResponse'
+            $ref: '#/definitions/validation.ValidationError'
         "401":
           description: Unauthorized
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/http.GeneralResponse'
+          schema: {}
       security:
       - BearerAuth: []
       - ApiKeyAuth: []

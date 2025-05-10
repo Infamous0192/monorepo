@@ -16,6 +16,7 @@ func SetupArticleDatabase(db *gorm.DB) error {
 		&entity.Article{},
 		&entity.Category{},
 		&entity.Tag{},
+		&entity.File{},
 	)
 	if err != nil {
 		log.Printf("Failed to migrate article database: %v", err)

@@ -105,6 +105,7 @@ func main() {
 	answerRepo := quizRepository.NewAnswerRepository(db)
 	submissionRepo := quizRepository.NewSubmissionRepository(db)
 	userRepo := quizRepository.NewUserRepository(db)
+	fileRepo := repository.NewFileRepository(db, cfg.App.UploadPath)
 
 	// Initialize article repositories
 	articleRepo := repository.NewArticleRepository(db)
@@ -120,7 +121,7 @@ func main() {
 	authService := quizServices.NewAuthService(userRepo, &cfg.Auth)
 
 	// Initialize article services
-	articleService := articleServices.NewArticleService(articleRepo, categoryRepo, tagRepo)
+	articleService := articleServices.NewArticleService(articleRepo, categoryRepo, tagRepo, fileRepo)
 	categoryService := articleServices.NewCategoryService(categoryRepo)
 	tagService := articleServices.NewTagService(tagRepo, articleRepo)
 
@@ -140,7 +141,7 @@ func main() {
 	authHandler := handlers.NewAuthHandler(authService, validation)
 
 	// Register article routes
-	articleHandler := articleHandlers.NewArticleHandler(articleService, validation)
+	articleHandler := articleHandlers.NewArticleHandler(articleService, fileRepo, validation)
 	categoryHandler := articleHandlers.NewCategoryHandler(categoryService, validation)
 	tagHandler := articleHandlers.NewTagHandler(tagService, validation)
 

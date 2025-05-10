@@ -19,6 +19,7 @@ type AppConfig struct {
 	Name        string `yaml:"name" env:"NAME" env-default:"quiz-service"`
 	Environment string `yaml:"environment" env:"ENVIRONMENT" env-default:"development"`
 	APIKey      string `yaml:"api_key" env:"API_KEY" env-default:"default-api-key"`
+	UploadPath  string `yaml:"upload_path" env:"UPLOAD_PATH" env-default:"uploads"`
 }
 
 // ServerConfig contains server-specific configuration

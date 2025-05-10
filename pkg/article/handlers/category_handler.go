@@ -169,7 +169,7 @@ func (h *CategoryHandler) GetCategoryBySlug(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Category ID"
-// @Success 200 {object} http.GeneralResponse{data=entity.CategoryHierarchy}
+// @Success 200 {object} http.GeneralResponse{data=entity.Category}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
