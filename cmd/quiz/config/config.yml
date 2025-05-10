@@ -2,7 +2,7 @@ app:
   name: quiz-service
   environment: development
   api_key: your-api-key-here
-  upload_path: ./uploads
+  upload_path: /app/uploads
 
 server:
   port: 8080

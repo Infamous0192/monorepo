@@ -28,7 +28,14 @@ COPY --from=builder /app/quiz .
 COPY --from=builder /app/cmd/quiz/config /app/config
 
 # Create a non-root user to run the application
-RUN adduser -D -g '' appuser
+RUN adduser -D -g '' -u 1000 appuser
+
+# Create uploads directory and set permissions
+RUN mkdir -p /app/uploads && \
+    chown -R appuser:appuser /app && \
+    chmod -R 755 /app
+
+# Switch to non-root user
 USER appuser
 
 # Set environment variables

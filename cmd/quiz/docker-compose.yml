@@ -21,6 +21,8 @@ services:
       - APP_API_KEY=your-secure-api-key
     volumes:
       - ./config:/app/config
+      - ../../uploads:/app/uploads
+    user: "1000:1000"  # Set user to match appuser
     networks:
       - quiz-network
 
