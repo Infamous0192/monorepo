@@ -102,9 +102,6 @@ func main() {
 	errorMiddleware := middleware.NewErrorMiddleware()
 	keyMiddleware := middleware.NewKeyMiddleware(cfg.App.APIKey)
 
-	// Initialize validation
-	validation.NewValidation() // Initialize validation package
-
 	// Initialize quiz repositories
 	quizRepo := quizRepository.NewQuizRepository(db)
 	questionRepo := quizRepository.NewQuestionRepository(db)
@@ -128,9 +125,9 @@ func main() {
 	)
 
 	// Initialize article services
-	articleSvc := articleServices.NewArticleService(articleRepo, categoryRepo, tagRepo)
-	categorySvc := articleServices.NewCategoryService(categoryRepo)
-	tagSvc := articleServices.NewTagService(tagRepo, articleRepo)
+	articleService := articleServices.NewArticleService(articleRepo, categoryRepo, tagRepo)
+	categoryService := articleServices.NewCategoryService(categoryRepo)
+	tagService := articleServices.NewTagService(tagRepo, articleRepo)
 
 	// Initialize Fiber app with error handler from config
 	app := fiber.New(fiber.Config{
@@ -162,10 +159,13 @@ func main() {
 	// Register quiz routes
 	handlers.SetupRoutes(app, quizServices)
 
+	// Register Plugins
+	validation := validation.NewValidation()
+
 	// Register article routes
-	articleHandler := articleHandlers.NewArticleHandler(articleSvc, categorySvc, tagSvc)
-	categoryHandler := articleHandlers.NewCategoryHandler(categorySvc)
-	tagHandler := articleHandlers.NewTagHandler(tagSvc)
+	articleHandler := articleHandlers.NewArticleHandler(articleService, validation)
+	categoryHandler := articleHandlers.NewCategoryHandler(categoryService, validation)
+	tagHandler := articleHandlers.NewTagHandler(tagService, validation)
 
 	// Set up routes for each handler
 	articleHandler.RegisterRoutes(app, keyMiddleware.ValidateKey())

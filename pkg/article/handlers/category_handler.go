@@ -3,6 +3,7 @@ package handlers
 import (
 	"app/pkg/article/domain/entity"
 	"app/pkg/article/domain/service"
+	"app/pkg/types/http"
 	"app/pkg/types/pagination"
 	"app/pkg/validation"
 
@@ -16,10 +17,13 @@ type CategoryHandler struct {
 }
 
 // NewCategoryHandler creates a new category handler
-func NewCategoryHandler(categoryService service.CategoryService) *CategoryHandler {
+func NewCategoryHandler(
+	categoryService service.CategoryService,
+	validation *validation.Validation,
+) *CategoryHandler {
 	return &CategoryHandler{
 		categoryService: categoryService,
-		validation:      validation.NewValidation(),
+		validation:      validation,
 	}
 }
 
@@ -50,7 +54,7 @@ func (h *CategoryHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=[]entity.Category}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} error
 // @Router /categories [get]
@@ -84,9 +88,10 @@ func (h *CategoryHandler) GetCategories(c *fiber.Ctx) error {
 		HasNext: int64(query.Page*query.Limit) < total,
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data": fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Categories retrieved successfully",
+		Data: fiber.Map{
 			"metadata": meta,
 			"result":   categories,
 		},
@@ -100,7 +105,7 @@ func (h *CategoryHandler) GetCategories(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Category ID"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=entity.Category}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
@@ -116,9 +121,10 @@ func (h *CategoryHandler) GetCategory(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   category,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Category retrieved successfully",
+		Data:    category,
 	})
 }
 
@@ -129,7 +135,7 @@ func (h *CategoryHandler) GetCategory(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param slug path string true "Category slug"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=entity.Category}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
@@ -149,9 +155,10 @@ func (h *CategoryHandler) GetCategoryBySlug(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   category,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Category retrieved successfully",
+		Data:    category,
 	})
 }
 
@@ -162,7 +169,7 @@ func (h *CategoryHandler) GetCategoryBySlug(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Category ID"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=entity.CategoryHierarchy}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
@@ -178,9 +185,10 @@ func (h *CategoryHandler) GetCategoryHierarchy(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   hierarchy,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Category hierarchy retrieved successfully",
+		Data:    hierarchy,
 	})
 }
 
@@ -191,7 +199,7 @@ func (h *CategoryHandler) GetCategoryHierarchy(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Category ID"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=[]entity.Category}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
@@ -207,9 +215,10 @@ func (h *CategoryHandler) GetCategoryChildren(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   children,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Category children retrieved successfully",
+		Data:    children,
 	})
 }
 
@@ -220,7 +229,7 @@ func (h *CategoryHandler) GetCategoryChildren(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param category body entity.CategoryDTO true "Category information"
-// @Success 201 {object} fiber.Map
+// @Success 201 {object} http.GeneralResponse{data=entity.Category}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 500 {object} error
@@ -238,9 +247,10 @@ func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Status(201).JSON(fiber.Map{
-		"status": 201,
-		"data":   category,
+	return c.Status(fiber.StatusCreated).JSON(http.GeneralResponse{
+		Status:  fiber.StatusCreated,
+		Message: "Category created successfully",
+		Data:    category,
 	})
 }
 
@@ -252,7 +262,7 @@ func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Category ID"
 // @Param category body entity.CategoryDTO true "Updated category information"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=entity.Category}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 404 {object} error
@@ -275,9 +285,10 @@ func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   category,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Category updated successfully",
+		Data:    category,
 	})
 }
 
@@ -288,7 +299,7 @@ func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Category ID"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 404 {object} error
@@ -305,8 +316,8 @@ func (h *CategoryHandler) DeleteCategory(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status":  200,
-		"message": "Category deleted successfully",
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Category deleted successfully",
 	})
 }

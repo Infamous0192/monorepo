@@ -3,6 +3,7 @@ package handlers
 import (
 	"app/pkg/article/domain/entity"
 	"app/pkg/article/domain/service"
+	"app/pkg/types/http"
 	"app/pkg/types/pagination"
 	"app/pkg/validation"
 
@@ -16,10 +17,13 @@ type TagHandler struct {
 }
 
 // NewTagHandler creates a new tag handler
-func NewTagHandler(tagService service.TagService) *TagHandler {
+func NewTagHandler(
+	tagService service.TagService,
+	validation *validation.Validation,
+) *TagHandler {
 	return &TagHandler{
 		tagService: tagService,
-		validation: validation.NewValidation(),
+		validation: validation,
 	}
 }
 
@@ -49,7 +53,7 @@ func (h *TagHandler) RegisterRoutes(app *fiber.App, apiKeyMiddleware fiber.Handl
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=[]entity.Tag}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 500 {object} error
 // @Router /tags [get]
@@ -83,9 +87,10 @@ func (h *TagHandler) GetTags(c *fiber.Ctx) error {
 		HasNext: int64(query.Page*query.Limit) < total,
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data": fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Tags retrieved successfully",
+		Data: fiber.Map{
 			"metadata": meta,
 			"result":   tags,
 		},
@@ -99,7 +104,7 @@ func (h *TagHandler) GetTags(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Tag ID"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=entity.Tag}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
@@ -115,9 +120,10 @@ func (h *TagHandler) GetTag(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   tag,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Tag retrieved successfully",
+		Data:    tag,
 	})
 }
 
@@ -128,7 +134,7 @@ func (h *TagHandler) GetTag(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param slug path string true "Tag slug"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=entity.Tag}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
@@ -148,9 +154,10 @@ func (h *TagHandler) GetTagBySlug(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   tag,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Tag retrieved successfully",
+		Data:    tag,
 	})
 }
 
@@ -161,7 +168,7 @@ func (h *TagHandler) GetTagBySlug(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param articleId path int true "Article ID"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=[]entity.Tag}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
@@ -177,9 +184,10 @@ func (h *TagHandler) GetTagsByArticle(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   tags,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Article tags retrieved successfully",
+		Data:    tags,
 	})
 }
 
@@ -190,7 +198,7 @@ func (h *TagHandler) GetTagsByArticle(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param tag body entity.TagDTO true "Tag information"
-// @Success 201 {object} fiber.Map
+// @Success 201 {object} http.GeneralResponse{data=entity.Tag}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 500 {object} error
@@ -208,9 +216,10 @@ func (h *TagHandler) CreateTag(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Status(201).JSON(fiber.Map{
-		"status": 201,
-		"data":   tag,
+	return c.Status(fiber.StatusCreated).JSON(http.GeneralResponse{
+		Status:  fiber.StatusCreated,
+		Message: "Tag created successfully",
+		Data:    tag,
 	})
 }
 
@@ -222,7 +231,7 @@ func (h *TagHandler) CreateTag(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "Tag ID"
 // @Param tag body entity.TagDTO true "Updated tag information"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse{data=entity.Tag}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 404 {object} error
@@ -245,9 +254,10 @@ func (h *TagHandler) UpdateTag(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status": 200,
-		"data":   tag,
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Tag updated successfully",
+		Data:    tag,
 	})
 }
 
@@ -258,7 +268,7 @@ func (h *TagHandler) UpdateTag(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Tag ID"
-// @Success 200 {object} fiber.Map
+// @Success 200 {object} http.GeneralResponse
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 404 {object} error
@@ -275,8 +285,8 @@ func (h *TagHandler) DeleteTag(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(fiber.Map{
-		"status":  200,
-		"message": "Tag deleted successfully",
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Tag deleted successfully",
 	})
 }
