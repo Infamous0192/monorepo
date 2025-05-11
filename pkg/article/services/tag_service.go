@@ -6,6 +6,7 @@ import (
 	"app/pkg/article/domain/service"
 	"app/pkg/exception"
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/gosimple/slug"
@@ -53,6 +54,34 @@ func (s *tagService) GetByArticle(ctx context.Context, articleID uint) ([]*entit
 	return s.tagRepo.FindByArticleID(ctx, articleID)
 }
 
+// generateUniqueSlug creates a unique slug by appending a numeric suffix if needed
+func (s *tagService) generateUniqueSlug(ctx context.Context, baseSlug string, excludeID *uint) (string, error) {
+	// Try the base slug first
+	uniqueSlug := baseSlug
+	suffix := 1
+
+	for {
+		// Check if slug exists
+		tag, err := s.tagRepo.FindBySlug(ctx, uniqueSlug)
+		if err != nil {
+			// If not found, slug is unique
+			if err.Error() == "Tag not found" {
+				return uniqueSlug, nil
+			}
+			return "", err // Return other errors
+		}
+
+		// If tag found and it's the same as we're updating, slug is fine
+		if excludeID != nil && tag.ID == *excludeID {
+			return uniqueSlug, nil
+		}
+
+		// Try next suffix
+		uniqueSlug = fmt.Sprintf("%s-%d", baseSlug, suffix)
+		suffix++
+	}
+}
+
 // Create stores a new tag
 func (s *tagService) Create(ctx context.Context, dto entity.TagDTO) (*entity.Tag, error) {
 	// Validate name
@@ -68,11 +97,17 @@ func (s *tagService) Create(ctx context.Context, dto entity.TagDTO) (*entity.Tag
 		tagSlug = slug.Make(dto.Name)
 	}
 
+	// Ensure slug is unique
+	uniqueSlug, err := s.generateUniqueSlug(ctx, tagSlug, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	// Create tag entity
 	tag := &entity.Tag{
 		Name:        dto.Name,
 		Description: dto.Description,
-		Slug:        tagSlug,
+		Slug:        uniqueSlug,
 	}
 
 	// Store tag
@@ -108,7 +143,12 @@ func (s *tagService) Update(ctx context.Context, id uint, dto entity.TagDTO) (*e
 		tag.Slug = dto.Slug
 	} else if tag.Name != dto.Name {
 		// Generate new slug if name changed and slug not specified
-		tag.Slug = slug.Make(dto.Name)
+		baseSlug := slug.Make(dto.Name)
+		uniqueSlug, err := s.generateUniqueSlug(ctx, baseSlug, &id)
+		if err != nil {
+			return nil, err
+		}
+		tag.Slug = uniqueSlug
 	}
 
 	// Update tag

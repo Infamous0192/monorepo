@@ -6,6 +6,7 @@ import (
 	"app/pkg/article/domain/service"
 	"app/pkg/exception"
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/gosimple/slug"
@@ -48,6 +49,34 @@ func (s *categoryService) GetChildren(ctx context.Context, parentID uint) ([]*en
 	return s.categoryRepo.FindChildren(ctx, parentID)
 }
 
+// generateUniqueSlug creates a unique slug by appending a numeric suffix if needed
+func (s *categoryService) generateUniqueSlug(ctx context.Context, baseSlug string, excludeID *uint) (string, error) {
+	// Try the base slug first
+	uniqueSlug := baseSlug
+	suffix := 1
+
+	for {
+		// Check if slug exists
+		category, err := s.categoryRepo.FindBySlug(ctx, uniqueSlug)
+		if err != nil {
+			// If not found, slug is unique
+			if err.Error() == "Category not found" {
+				return uniqueSlug, nil
+			}
+			return "", err // Return other errors
+		}
+
+		// If category found and it's the same as we're updating, slug is fine
+		if excludeID != nil && category.ID == *excludeID {
+			return uniqueSlug, nil
+		}
+
+		// Try next suffix
+		uniqueSlug = fmt.Sprintf("%s-%d", baseSlug, suffix)
+		suffix++
+	}
+}
+
 // Create stores a new category
 func (s *categoryService) Create(ctx context.Context, dto entity.CategoryDTO) (*entity.Category, error) {
 	// Validate name
@@ -63,11 +92,17 @@ func (s *categoryService) Create(ctx context.Context, dto entity.CategoryDTO) (*
 		categorySlug = slug.Make(dto.Name)
 	}
 
+	// Ensure slug is unique
+	uniqueSlug, err := s.generateUniqueSlug(ctx, categorySlug, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	// Create category entity
 	category := &entity.Category{
 		Name:        dto.Name,
 		Description: dto.Description,
-		Slug:        categorySlug,
+		Slug:        uniqueSlug,
 		ParentID:    dto.ParentID,
 	}
 
@@ -104,7 +139,12 @@ func (s *categoryService) Update(ctx context.Context, id uint, dto entity.Catego
 		category.Slug = dto.Slug
 	} else if category.Name != dto.Name {
 		// Generate new slug if name changed and slug not specified
-		category.Slug = slug.Make(dto.Name)
+		baseSlug := slug.Make(dto.Name)
+		uniqueSlug, err := s.generateUniqueSlug(ctx, baseSlug, &id)
+		if err != nil {
+			return nil, err
+		}
+		category.Slug = uniqueSlug
 	}
 
 	// Update parent if provided
