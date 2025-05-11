@@ -36,8 +36,8 @@ func NewArticleHandler(
 }
 
 // RegisterRoutes registers all routes for article handling
-func (h *ArticleHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Handler) {
-	api := app.Group("/api/articles")
+func (h *ArticleHandler) RegisterRoutes(app fiber.Router, authMiddleware fiber.Handler) {
+	api := app.Group("/articles")
 
 	// Public routes (no API key required)
 	api.Get("/", h.GetArticles)

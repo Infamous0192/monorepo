@@ -172,18 +172,20 @@ func main() {
 		})
 	})
 
+	api := app.Group("/api")
+
 	// Register article routes
-	articleHandler.RegisterRoutes(app, authMiddleware.RequireAdmin())
-	categoryHandler.RegisterRoutes(app, authMiddleware.RequireAdmin())
-	tagHandler.RegisterRoutes(app, authMiddleware.RequireAdmin())
+	articleHandler.RegisterRoutes(api, authMiddleware.RequireAdmin())
+	categoryHandler.RegisterRoutes(api, authMiddleware.RequireAdmin())
+	tagHandler.RegisterRoutes(api, authMiddleware.RequireAdmin())
 
 	// Register quiz routes
-	quizHandler.RegisterRoutes(app, authMiddleware)
-	questionHandler.RegisterRoutes(app, authMiddleware)
-	answerHandler.RegisterRoutes(app, authMiddleware)
-	submissionHandler.RegisterRoutes(app, authMiddleware)
-	userHandler.RegisterRoutes(app, authMiddleware)
-	authHandler.RegisterRoutes(app)
+	quizHandler.RegisterRoutes(api, authMiddleware)
+	questionHandler.RegisterRoutes(api, authMiddleware)
+	answerHandler.RegisterRoutes(api, authMiddleware)
+	submissionHandler.RegisterRoutes(api, authMiddleware)
+	userHandler.RegisterRoutes(api, authMiddleware)
+	authHandler.RegisterRoutes(api)
 
 	// Start server
 	go func() {

@@ -28,8 +28,8 @@ func NewCategoryHandler(
 }
 
 // RegisterRoutes registers all routes for category handling
-func (h *CategoryHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Handler) {
-	api := app.Group("/api/categories")
+func (h *CategoryHandler) RegisterRoutes(app fiber.Router, authMiddleware fiber.Handler) {
+	api := app.Group("/categories")
 
 	// Public routes (no API key required)
 	api.Get("/", h.GetCategories)
@@ -39,7 +39,7 @@ func (h *CategoryHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Ha
 	api.Get("/:id/children", h.GetCategoryChildren)
 
 	// Protected routes (API key required)
-	protected := api.Use(authMiddleware)
+	protected := app.Use(authMiddleware)
 	protected.Post("/", h.CreateCategory)
 	protected.Put("/:id", h.UpdateCategory)
 	protected.Delete("/:id", h.DeleteCategory)

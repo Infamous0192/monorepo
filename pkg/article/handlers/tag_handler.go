@@ -28,8 +28,8 @@ func NewTagHandler(
 }
 
 // RegisterRoutes registers all routes for tag handling
-func (h *TagHandler) RegisterRoutes(app *fiber.App, authMiddleware fiber.Handler) {
-	api := app.Group("/api/tags")
+func (h *TagHandler) RegisterRoutes(app fiber.Router, authMiddleware fiber.Handler) {
+	api := app.Group("/tags")
 
 	// Public routes (no API key required)
 	api.Get("/", h.GetTags)
