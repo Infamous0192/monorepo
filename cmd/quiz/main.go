@@ -45,7 +45,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host 157.245.61.194:8082
+// @host 127.0.0.1:8080
 // @BasePath /api
 // @schemes http https
 
@@ -186,6 +186,9 @@ func main() {
 	submissionHandler.RegisterRoutes(api, authMiddleware)
 	userHandler.RegisterRoutes(api, authMiddleware)
 	authHandler.RegisterRoutes(api, authMiddleware)
+
+	// Serve static files from the /uploads directory
+	app.Static("/uploads", cfg.App.UploadPath)
 
 	// Start server
 	go func() {
