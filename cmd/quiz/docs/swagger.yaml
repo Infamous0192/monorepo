@@ -121,6 +121,8 @@ definitions:
     type: object
   app_pkg_quiz_domain_entity.AnswerDTO:
     properties:
+      id:
+        type: integer
       question:
         type: integer
       text:

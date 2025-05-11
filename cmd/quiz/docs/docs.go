@@ -3605,6 +3605,9 @@ const docTemplate = `{
                 "value"
             ],
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "question": {
                     "type": "integer"
                 },
