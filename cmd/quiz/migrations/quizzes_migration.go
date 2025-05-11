@@ -16,7 +16,6 @@ func SetupQuizDatabase(db *gorm.DB) error {
 		// Quiz entities
 		&entity.Quiz{},
 		&entity.Question{},
-		&entity.Option{},
 		&entity.Answer{},
 		&entity.Submission{},
 		&entity.User{},
@@ -95,77 +94,77 @@ func seedQuizData(db *gorm.DB) error {
 	}
 
 	// Create options for each question
-	options := []entity.Option{
+	options := []entity.Answer{
 		// Options for question 1
 		{
 			QuestionID: questions[0].ID,
-			Content:    "Hyper Text Markup Language",
-			IsCorrect:  true,
+			Text:       "Hyper Text Markup Language",
+			Value:      1,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		{
 			QuestionID: questions[0].ID,
-			Content:    "High Tech Multi Language",
-			IsCorrect:  false,
+			Text:       "High Tech Multi Language",
+			Value:      0,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		{
 			QuestionID: questions[0].ID,
-			Content:    "Hyper Transfer Markup Language",
-			IsCorrect:  false,
+			Text:       "Hyper Transfer Markup Language",
+			Value:      0,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		// Options for question 2
 		{
 			QuestionID: questions[1].ID,
-			Content:    "HTML",
-			IsCorrect:  false,
+			Text:       "HTML",
+			Value:      1,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		{
 			QuestionID: questions[1].ID,
-			Content:    "CSS",
-			IsCorrect:  true,
+			Text:       "CSS",
+			Value:      0,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		{
 			QuestionID: questions[1].ID,
-			Content:    "JavaScript",
-			IsCorrect:  false,
+			Text:       "JavaScript",
+			Value:      0,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		// Options for question 3
 		{
 			QuestionID: questions[2].ID,
-			Content:    "React",
-			IsCorrect:  true,
+			Text:       "React",
+			Value:      1,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		{
 			QuestionID: questions[2].ID,
-			Content:    "Angular",
-			IsCorrect:  true,
+			Text:       "Angular",
+			Value:      0,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		{
 			QuestionID: questions[2].ID,
-			Content:    "Python",
-			IsCorrect:  false,
+			Text:       "Python",
+			Value:      0,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 		{
 			QuestionID: questions[2].ID,
-			Content:    "Vue",
-			IsCorrect:  true,
+			Text:       "Vue",
+			Value:      0,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},

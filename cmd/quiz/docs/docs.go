@@ -3648,43 +3648,6 @@ const docTemplate = `{
                 }
             }
         },
-        "app_pkg_quiz_domain_entity.Option": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "isCorrect": {
-                    "type": "boolean"
-                },
-                "questionId": {
-                    "type": "integer"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_pkg_quiz_domain_entity.OptionDTO": {
-            "type": "object",
-            "required": [
-                "content"
-            ],
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "isCorrect": {
-                    "type": "boolean"
-                }
-            }
-        },
         "app_pkg_quiz_domain_entity.Question": {
             "type": "object",
             "properties": {
@@ -3702,12 +3665,6 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
-                },
-                "options": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app_pkg_quiz_domain_entity.Option"
-                    }
                 },
                 "quizId": {
                     "type": "integer"
@@ -3732,12 +3689,6 @@ const docTemplate = `{
                 },
                 "content": {
                     "type": "string"
-                },
-                "options": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app_pkg_quiz_domain_entity.OptionDTO"
-                    }
                 },
                 "quizId": {
                     "type": "integer"

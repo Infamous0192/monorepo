@@ -11,35 +11,16 @@ type Question struct {
 	Content string `json:"content"`
 	QuizID  uint   `json:"quizId" gorm:"column:quiz_id"`
 
-	Options []Option `json:"options"`
 	Answers []Answer `json:"answers"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
 }
 
-// Option represents a question option entity
-type Option struct {
-	ID         uint   `json:"id" gorm:"primarykey, autoIncrement"`
-	Content    string `json:"content"`
-	IsCorrect  bool   `json:"isCorrect" gorm:"column:is_correct"`
-	QuestionID uint   `json:"questionId" gorm:"column:question_id"`
-
-	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
-}
-
-// OptionDTO represents the data transfer object for creating or updating an option
-type OptionDTO struct {
-	Content   string `json:"content" validate:"required"`
-	IsCorrect bool   `json:"isCorrect"`
-}
-
 // QuestionDTO represents the data transfer object for creating or updating a question
 type QuestionDTO struct {
 	Content string      `json:"content" validate:"required"`
 	QuizID  uint        `json:"quizId" validate:"required"`
-	Options []OptionDTO `json:"options" validate:"omitempty,dive"`
 	Answers []AnswerDTO `json:"answers" validate:"omitempty,dive"`
 }
 

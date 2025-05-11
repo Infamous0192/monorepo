@@ -58,16 +58,16 @@ func (s *questionService) Create(ctx context.Context, questionDTO entity.Questio
 		QuizID:  questionDTO.QuizID,
 	}
 
-	// Create options if provided
-	if len(questionDTO.Options) > 0 {
-		options := make([]entity.Option, len(questionDTO.Options))
-		for i, optionDTO := range questionDTO.Options {
-			options[i] = entity.Option{
-				Content:   optionDTO.Content,
-				IsCorrect: optionDTO.IsCorrect,
+	// Create answers if provided
+	if len(questionDTO.Answers) > 0 {
+		answers := make([]entity.Answer, len(questionDTO.Answers))
+		for i, answerDTO := range questionDTO.Answers {
+			answers[i] = entity.Answer{
+				Text:  answerDTO.Text,
+				Value: *answerDTO.Value,
 			}
 		}
-		question.Options = options
+		question.Answers = answers
 	}
 
 	// Create answers if provided
@@ -102,17 +102,17 @@ func (s *questionService) Update(ctx context.Context, id uint, questionDTO entit
 	question.Content = questionDTO.Content
 	question.QuizID = questionDTO.QuizID
 
-	// Handle options update (simplified - in real implementation would need to handle deletions)
-	if len(questionDTO.Options) > 0 {
-		options := make([]entity.Option, len(questionDTO.Options))
-		for i, optionDTO := range questionDTO.Options {
-			options[i] = entity.Option{
-				Content:    optionDTO.Content,
-				IsCorrect:  optionDTO.IsCorrect,
+	// Handle answers update (simplified - in real implementation would need to handle deletions)
+	if len(questionDTO.Answers) > 0 {
+		answers := make([]entity.Answer, len(questionDTO.Answers))
+		for i, answerDTO := range questionDTO.Answers {
+			answers[i] = entity.Answer{
+				Text:       answerDTO.Text,
+				Value:      *answerDTO.Value,
 				QuestionID: id,
 			}
 		}
-		question.Options = options
+		question.Answers = answers
 	}
 
 	// Handle answers update (simplified)

@@ -141,30 +141,6 @@ definitions:
     - password
     - username
     type: object
-  app_pkg_quiz_domain_entity.Option:
-    properties:
-      content:
-        type: string
-      createdAt:
-        type: string
-      id:
-        type: integer
-      isCorrect:
-        type: boolean
-      questionId:
-        type: integer
-      updatedAt:
-        type: string
-    type: object
-  app_pkg_quiz_domain_entity.OptionDTO:
-    properties:
-      content:
-        type: string
-      isCorrect:
-        type: boolean
-    required:
-    - content
-    type: object
   app_pkg_quiz_domain_entity.Question:
     properties:
       answers:
@@ -177,10 +153,6 @@ definitions:
         type: string
       id:
         type: integer
-      options:
-        items:
-          $ref: '#/definitions/app_pkg_quiz_domain_entity.Option'
-        type: array
       quizId:
         type: integer
       updatedAt:
@@ -194,10 +166,6 @@ definitions:
         type: array
       content:
         type: string
-      options:
-        items:
-          $ref: '#/definitions/app_pkg_quiz_domain_entity.OptionDTO'
-        type: array
       quizId:
         type: integer
     required:
