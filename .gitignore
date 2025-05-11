@@ -1,6 +1,8 @@
 dist/
 node_modules/
 
+uploads/
+
 # Environment files
 .env
 .env.*
