@@ -51,14 +51,25 @@ func (m *AuthMiddleware) RequireAuth() fiber.Handler {
 // RequireRole middleware ensures the user has the required role
 func (m *AuthMiddleware) RequireRole(role string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// First require authentication
-		err := m.RequireAuth()(c)
+		// Get token from Authorization header
+		authHeader := c.Get("Authorization")
+		if authHeader == "" {
+			// Try getting from cookie
+			authHeader = c.Cookies("jwt")
+			if authHeader == "" {
+				return exception.Http(401, "Authentication required")
+			}
+		} else {
+			// Remove Bearer prefix if present
+			authHeader = strings.TrimPrefix(authHeader, "Bearer ")
+		}
+
+		// Validate token
+		claims, err := m.authService.ValidateToken(authHeader)
 		if err != nil {
 			return err
 		}
 
-		// Get claims from context
-		claims := c.Locals("user").(*auth.Claims)
 		if claims.Role != role {
 			return exception.Http(403, "Insufficient permissions")
 		}
