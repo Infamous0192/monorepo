@@ -2,6 +2,7 @@ package entity
 
 import (
 	"app/pkg/types/pagination"
+	"mime/multipart"
 	"time"
 )
 
@@ -24,13 +25,15 @@ type Article struct {
 
 // ArticleDTO represents the data transfer object for creating or updating an article
 type ArticleDTO struct {
-	Title       string     `json:"title" validate:"required"`
-	Content     string     `json:"content" validate:"required"`
-	Slug        string     `json:"slug,omitempty"`
-	PublishedAt *time.Time `json:"publishedAt,omitempty"`
-	CategoryIDs []uint     `json:"categoryIds,omitempty"`
-	TagIDs      []uint     `json:"tagIds,omitempty"`
-	ThumbnailID *uint      `json:"thumbnailId,omitempty"`
+	Title       string     `form:"title" validate:"required"`
+	Content     string     `form:"content" validate:"required"`
+	Slug        string     `form:"slug,omitempty"`
+	PublishedAt *time.Time `form:"publishedAt,omitempty"`
+	CategoryIDs []uint     `form:"categoryIds,omitempty"`
+	TagIDs      []uint     `form:"tagIds,omitempty"`
+	ThumbnailID *uint      `form:"thumbnailId,omitempty"`
+
+	Thumbnail *multipart.FileHeader `form:"thumbnail,omitempty"`
 }
 
 // ArticleQuery represents the query parameters for filtering articles

@@ -463,7 +463,7 @@ const docTemplate = `{
                 ],
                 "description": "Create a new article with the provided information",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -474,13 +474,56 @@ const docTemplate = `{
                 "summary": "Create a new article",
                 "parameters": [
                     {
-                        "description": "Article information",
-                        "name": "article",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/app_pkg_article_domain_entity.ArticleDTO"
-                        }
+                        "type": "string",
+                        "description": "Article title",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article content",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article slug (optional)",
+                        "name": "slug",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Published date in RFC3339 format (optional)",
+                        "name": "publishedAt",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Category IDs (optional)",
+                        "name": "categoryIds",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Tag IDs (optional)",
+                        "name": "tagIds",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Article thumbnail image (optional)",
+                        "name": "thumbnail",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -528,7 +571,7 @@ const docTemplate = `{
                 ],
                 "description": "Update an article with the provided information",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -546,13 +589,56 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Updated article information",
-                        "name": "article",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/app_pkg_article_domain_entity.ArticleDTO"
-                        }
+                        "type": "string",
+                        "description": "Article title",
+                        "name": "title",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article content",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Article slug (optional)",
+                        "name": "slug",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Published date in RFC3339 format (optional)",
+                        "name": "publishedAt",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Category IDs (optional)",
+                        "name": "categoryIds",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "Tag IDs (optional)",
+                        "name": "tagIds",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Article thumbnail image (optional)",
+                        "name": "thumbnail",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -3389,42 +3475,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_pkg_article_domain_entity.ArticleDTO": {
-            "type": "object",
-            "required": [
-                "content",
-                "title"
-            ],
-            "properties": {
-                "categoryIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "content": {
-                    "type": "string"
-                },
-                "publishedAt": {
-                    "type": "string"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "tagIds": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "thumbnailId": {
-                    "type": "integer"
-                },
-                "title": {
                     "type": "string"
                 }
             }

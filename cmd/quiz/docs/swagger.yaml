@@ -30,30 +30,6 @@ definitions:
       updatedAt:
         type: string
     type: object
-  app_pkg_article_domain_entity.ArticleDTO:
-    properties:
-      categoryIds:
-        items:
-          type: integer
-        type: array
-      content:
-        type: string
-      publishedAt:
-        type: string
-      slug:
-        type: string
-      tagIds:
-        items:
-          type: integer
-        type: array
-      thumbnailId:
-        type: integer
-      title:
-        type: string
-    required:
-    - content
-    - title
-    type: object
   app_pkg_article_domain_entity.Category:
     properties:
       createdAt:
@@ -723,15 +699,45 @@ paths:
       - articles
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Create a new article with the provided information
       parameters:
-      - description: Article information
-        in: body
-        name: article
+      - description: Article title
+        in: formData
+        name: title
         required: true
-        schema:
-          $ref: '#/definitions/app_pkg_article_domain_entity.ArticleDTO'
+        type: string
+      - description: Article content
+        in: formData
+        name: content
+        required: true
+        type: string
+      - description: Article slug (optional)
+        in: formData
+        name: slug
+        type: string
+      - description: Published date in RFC3339 format (optional)
+        in: formData
+        name: publishedAt
+        type: string
+      - collectionFormat: csv
+        description: Category IDs (optional)
+        in: formData
+        items:
+          type: integer
+        name: categoryIds
+        type: array
+      - collectionFormat: csv
+        description: Tag IDs (optional)
+        in: formData
+        items:
+          type: integer
+        name: tagIds
+        type: array
+      - description: Article thumbnail image (optional)
+        in: formData
+        name: thumbnail
+        type: file
       produces:
       - application/json
       responses:
@@ -797,7 +803,7 @@ paths:
       - articles
     put:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Update an article with the provided information
       parameters:
       - description: Article ID
@@ -805,12 +811,42 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Updated article information
-        in: body
-        name: article
+      - description: Article title
+        in: formData
+        name: title
         required: true
-        schema:
-          $ref: '#/definitions/app_pkg_article_domain_entity.ArticleDTO'
+        type: string
+      - description: Article content
+        in: formData
+        name: content
+        required: true
+        type: string
+      - description: Article slug (optional)
+        in: formData
+        name: slug
+        type: string
+      - description: Published date in RFC3339 format (optional)
+        in: formData
+        name: publishedAt
+        type: string
+      - collectionFormat: csv
+        description: Category IDs (optional)
+        in: formData
+        items:
+          type: integer
+        name: categoryIds
+        type: array
+      - collectionFormat: csv
+        description: Tag IDs (optional)
+        in: formData
+        items:
+          type: integer
+        name: tagIds
+        type: array
+      - description: Article thumbnail image (optional)
+        in: formData
+        name: thumbnail
+        type: file
       produces:
       - application/json
       responses:

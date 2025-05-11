@@ -150,9 +150,15 @@ func (h *ArticleHandler) GetArticle(c *fiber.Ctx) error {
 // @Summary Create a new article
 // @Description Create a new article with the provided information
 // @Tags articles
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
-// @Param article body entity.ArticleDTO true "Article information"
+// @Param title formData string true "Article title"
+// @Param content formData string true "Article content"
+// @Param slug formData string false "Article slug (optional)"
+// @Param publishedAt formData string false "Published date in RFC3339 format (optional)"
+// @Param categoryIds formData []int false "Category IDs (optional)"
+// @Param tagIds formData []int false "Tag IDs (optional)"
+// @Param thumbnail formData file false "Article thumbnail image (optional)"
 // @Success 201 {object} http.GeneralResponse{data=entity.Article}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
@@ -217,10 +223,16 @@ func (h *ArticleHandler) CreateArticle(c *fiber.Ctx) error {
 // @Summary Update an existing article
 // @Description Update an article with the provided information
 // @Tags articles
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
 // @Param id path int true "Article ID"
-// @Param article body entity.ArticleDTO true "Updated article information"
+// @Param title formData string true "Article title"
+// @Param content formData string true "Article content"
+// @Param slug formData string false "Article slug (optional)"
+// @Param publishedAt formData string false "Published date in RFC3339 format (optional)"
+// @Param categoryIds formData []int false "Category IDs (optional)"
+// @Param tagIds formData []int false "Tag IDs (optional)"
+// @Param thumbnail formData file false "Article thumbnail image (optional)"
 // @Success 200 {object} http.GeneralResponse{data=entity.Article}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
