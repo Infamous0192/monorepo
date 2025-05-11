@@ -11,7 +11,7 @@ type Quiz struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 
-	Questions []Question `json:"questions"`
+	Questions []Question `json:"questions" gorm:"constraint:OnDelete:CASCADE"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`

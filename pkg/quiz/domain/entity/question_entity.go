@@ -11,7 +11,7 @@ type Question struct {
 	Text   string `json:"text"`
 	QuizID uint   `json:"quizId" gorm:"column:quiz_id"`
 
-	Answers []Answer `json:"answers"`
+	Answers []Answer `json:"answers" gorm:"constraint:OnDelete:CASCADE"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
