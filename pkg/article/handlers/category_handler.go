@@ -39,7 +39,7 @@ func (h *CategoryHandler) RegisterRoutes(app fiber.Router, authMiddleware fiber.
 	api.Get("/:id/children", h.GetCategoryChildren)
 
 	// Protected routes (API key required)
-	protected := app.Use(authMiddleware)
+	protected := api.Use(authMiddleware)
 	protected.Post("/", h.CreateCategory)
 	protected.Put("/:id", h.UpdateCategory)
 	protected.Delete("/:id", h.DeleteCategory)
