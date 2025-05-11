@@ -25,7 +25,7 @@ func NewQuizRepository(db *gorm.DB) repository.QuizRepository {
 // FindOne retrieves a single quiz by ID
 func (r *QuizRepository) FindOne(ctx context.Context, id uint) (*entity.Quiz, error) {
 	var quiz entity.Quiz
-	tx := r.db.WithContext(ctx).Preload("Questions").First(&quiz, id)
+	tx := r.db.WithContext(ctx).Preload("Questions").Preload("Questions.Answers").First(&quiz, id)
 	if tx.Error != nil {
 		if tx.Error == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -61,7 +61,7 @@ func (r *QuizRepository) FindAll(ctx context.Context, query entity.QuizQuery) ([
 	}
 
 	// Execute query with sorting
-	err := db.Order("created_at DESC").Preload("Questions").Find(&quizzes).Error
+	err := db.Order("created_at DESC").Preload("Questions").Preload("Questions.Answers").Find(&quizzes).Error
 	if err != nil {
 		return nil, 0, err
 	}
