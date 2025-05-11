@@ -7,8 +7,6 @@ type RegisterDTO struct {
 	Name      string    `json:"name" validate:"required"`
 	Username  string    `json:"username" validate:"required"`
 	Password  string    `json:"password" validate:"required"`
-	Role      string    `json:"role" validate:"required,oneof=admin user"`
-	Status    bool      `json:"status" validate:"required"`
 	BirthDate time.Time `json:"birthDate" validate:"required"`
 }
 

@@ -76,8 +76,8 @@ func (s *authService) Register(registerDTO *entity.RegisterDTO) (*entity.User, e
 		Name:      registerDTO.Name,
 		Username:  registerDTO.Username,
 		Password:  hashedPassword,
-		Role:      registerDTO.Role,
-		Status:    registerDTO.Status,
+		Role:      entity.RoleUser,
+		Status:    true,
 		BirthDate: registerDTO.BirthDate,
 	}
 

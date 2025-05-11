@@ -3790,8 +3790,6 @@ const docTemplate = `{
                 "birthDate",
                 "name",
                 "password",
-                "role",
-                "status",
                 "username"
             ],
             "properties": {
@@ -3803,16 +3801,6 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
-                },
-                "role": {
-                    "type": "string",
-                    "enum": [
-                        "admin",
-                        "user"
-                    ]
-                },
-                "status": {
-                    "type": "boolean"
                 },
                 "username": {
                     "type": "string"
