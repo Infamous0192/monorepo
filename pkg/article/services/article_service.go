@@ -6,6 +6,7 @@ import (
 	"app/pkg/article/domain/service"
 	"app/pkg/exception"
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -50,6 +51,34 @@ func (s *articleService) GetAll(ctx context.Context, query entity.ArticleQuery) 
 	return s.articleRepo.FindAll(ctx, query)
 }
 
+// generateUniqueSlug creates a unique slug by appending a numeric suffix if needed
+func (s *articleService) generateUniqueSlug(ctx context.Context, baseSlug string, excludeID *uint) (string, error) {
+	// Try the base slug first
+	uniqueSlug := baseSlug
+	suffix := 1
+
+	for {
+		// Check if slug exists
+		article, err := s.articleRepo.FindBySlug(ctx, uniqueSlug)
+		if err != nil {
+			// If not found, slug is unique
+			if err.Error() == "Article not found" {
+				return uniqueSlug, nil
+			}
+			return "", err // Return other errors
+		}
+
+		// If article found and it's the same as we're updating, slug is fine
+		if excludeID != nil && article.ID == *excludeID {
+			return uniqueSlug, nil
+		}
+
+		// Try next suffix
+		uniqueSlug = fmt.Sprintf("%s-%d", baseSlug, suffix)
+		suffix++
+	}
+}
+
 // Create stores a new article
 func (s *articleService) Create(ctx context.Context, dto entity.ArticleDTO) (*entity.Article, error) {
 	// Generate slug if not provided
@@ -58,11 +87,17 @@ func (s *articleService) Create(ctx context.Context, dto entity.ArticleDTO) (*en
 		articleSlug = slug.Make(dto.Title)
 	}
 
+	// Ensure slug is unique
+	uniqueSlug, err := s.generateUniqueSlug(ctx, articleSlug, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	// Create article entity
 	article := &entity.Article{
 		Title:       dto.Title,
 		Content:     dto.Content,
-		Slug:        articleSlug,
+		Slug:        uniqueSlug,
 		PublishedAt: dto.PublishedAt,
 	}
 
@@ -122,7 +157,12 @@ func (s *articleService) Update(ctx context.Context, id uint, dto entity.Article
 		article.Slug = dto.Slug
 	} else if article.Title != dto.Title {
 		// Generate new slug if title changed and slug not specified
-		article.Slug = slug.Make(dto.Title)
+		baseSlug := slug.Make(dto.Title)
+		uniqueSlug, err := s.generateUniqueSlug(ctx, baseSlug, &id)
+		if err != nil {
+			return nil, err
+		}
+		article.Slug = uniqueSlug
 	}
 
 	// Update published status if provided
