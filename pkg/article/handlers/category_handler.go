@@ -233,7 +233,7 @@ func (h *CategoryHandler) GetCategoryChildren(c *fiber.Ctx) error {
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /categories [post]
 func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 	var dto entity.CategoryDTO
@@ -267,7 +267,7 @@ func (h *CategoryHandler) CreateCategory(c *fiber.Ctx) error {
 // @Failure 401 {object} error
 // @Failure 404 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /categories/{id} [put]
 func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
@@ -304,7 +304,7 @@ func (h *CategoryHandler) UpdateCategory(c *fiber.Ctx) error {
 // @Failure 401 {object} error
 // @Failure 404 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /categories/{id} [delete]
 func (h *CategoryHandler) DeleteCategory(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)

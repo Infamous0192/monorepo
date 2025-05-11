@@ -163,7 +163,7 @@ func (h *ArticleHandler) GetArticle(c *fiber.Ctx) error {
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /articles [post]
 func (h *ArticleHandler) CreateArticle(c *fiber.Ctx) error {
 	var dto entity.ArticleDTO
@@ -238,7 +238,7 @@ func (h *ArticleHandler) CreateArticle(c *fiber.Ctx) error {
 // @Failure 401 {object} error
 // @Failure 404 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /articles/{id} [put]
 func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
@@ -311,7 +311,7 @@ func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
 // @Failure 401 {object} error
 // @Failure 404 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /articles/{id} [delete]
 func (h *ArticleHandler) DeleteArticle(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)

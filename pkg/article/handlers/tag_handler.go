@@ -202,7 +202,7 @@ func (h *TagHandler) GetTagsByArticle(c *fiber.Ctx) error {
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /tags [post]
 func (h *TagHandler) CreateTag(c *fiber.Ctx) error {
 	var dto entity.TagDTO
@@ -236,7 +236,7 @@ func (h *TagHandler) CreateTag(c *fiber.Ctx) error {
 // @Failure 401 {object} error
 // @Failure 404 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /tags/{id} [put]
 func (h *TagHandler) UpdateTag(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
@@ -273,7 +273,7 @@ func (h *TagHandler) UpdateTag(c *fiber.Ctx) error {
 // @Failure 401 {object} error
 // @Failure 404 {object} error
 // @Failure 500 {object} error
-// @Security ApiKeyAuth
+// @Security BearerAuth
 // @Router /tags/{id} [delete]
 func (h *TagHandler) DeleteTag(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
