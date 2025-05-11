@@ -5,15 +5,16 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache git
 
-# Download dependencies first (for better caching)
+# Cache go modules
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download && go mod verify
 
-# Copy source code
+# Copy source code and build
 COPY . .
-
-# Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o quiz ./cmd/quiz
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o quiz ./cmd/quiz
 
 # Use a small alpine image for the final container
 FROM alpine:3.18
@@ -33,7 +34,8 @@ RUN adduser -D -g '' -u 1000 appuser
 # Create uploads directory and set permissions
 RUN mkdir -p /app/uploads && \
     chown -R appuser:appuser /app && \
-    chmod -R 755 /app
+    chmod -R 755 /app && \
+    chmod 777 /app/uploads
 
 # Switch to non-root user
 USER appuser
