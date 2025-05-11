@@ -94,6 +94,7 @@ func (s *articleService) Create(ctx context.Context, dto entity.ArticleDTO) (*en
 		Title:       dto.Title,
 		Content:     dto.Content,
 		Slug:        uniqueSlug,
+		ThumbnailID: dto.ThumbnailID,
 		PublishedAt: dto.PublishedAt,
 	}
 
