@@ -50,7 +50,7 @@ func (r *QuestionRepository) FindAll(ctx context.Context, query entity.QuestionQ
 
 	if query.Keyword != "" {
 		searchTerm := fmt.Sprintf("%%%s%%", strings.ToLower(query.Keyword))
-		db = db.Where("LOWER(content) LIKE ?", searchTerm)
+		db = db.Where("LOWER(text) LIKE ?", searchTerm)
 	}
 
 	// Count total filtered records

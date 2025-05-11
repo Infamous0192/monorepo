@@ -71,19 +71,19 @@ func seedQuizData(db *gorm.DB) error {
 	questions := []entity.Question{
 		{
 			QuizID:    quiz.ID,
-			Content:   "What does HTML stand for?",
+			Text:      "What does HTML stand for?",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
 		{
 			QuizID:    quiz.ID,
-			Content:   "Which language is used for styling web pages?",
+			Text:      "Which language is used for styling web pages?",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
 		{
 			QuizID:    quiz.ID,
-			Content:   "Which of the following are JavaScript frameworks?",
+			Text:      "Which of the following are JavaScript frameworks?",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},

@@ -3657,9 +3657,6 @@ const docTemplate = `{
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.Answer"
                     }
                 },
-                "content": {
-                    "type": "string"
-                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -3669,6 +3666,9 @@ const docTemplate = `{
                 "quizId": {
                     "type": "integer"
                 },
+                "text": {
+                    "type": "string"
+                },
                 "updatedAt": {
                     "type": "string"
                 }
@@ -3677,8 +3677,8 @@ const docTemplate = `{
         "app_pkg_quiz_domain_entity.QuestionDTO": {
             "type": "object",
             "required": [
-                "content",
-                "quizId"
+                "quizId",
+                "text"
             ],
             "properties": {
                 "answers": {
@@ -3687,11 +3687,11 @@ const docTemplate = `{
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.AnswerDTO"
                     }
                 },
-                "content": {
-                    "type": "string"
-                },
                 "quizId": {
                     "type": "integer"
+                },
+                "text": {
+                    "type": "string"
                 }
             }
         },

@@ -7,9 +7,9 @@ import (
 
 // Question represents a quiz question entity
 type Question struct {
-	ID      uint   `json:"id" gorm:"primarykey, autoIncrement"`
-	Content string `json:"content"`
-	QuizID  uint   `json:"quizId" gorm:"column:quiz_id"`
+	ID     uint   `json:"id" gorm:"primarykey, autoIncrement"`
+	Text   string `json:"text"`
+	QuizID uint   `json:"quizId" gorm:"column:quiz_id"`
 
 	Answers []Answer `json:"answers"`
 
@@ -19,7 +19,7 @@ type Question struct {
 
 // QuestionDTO represents the data transfer object for creating or updating a question
 type QuestionDTO struct {
-	Content string      `json:"content" validate:"required"`
+	Text    string      `json:"text" validate:"required"`
 	QuizID  uint        `json:"quizId" validate:"required"`
 	Answers []AnswerDTO `json:"answers" validate:"omitempty,dive"`
 }

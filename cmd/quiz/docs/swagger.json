@@ -3655,9 +3655,6 @@
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.Answer"
                     }
                 },
-                "content": {
-                    "type": "string"
-                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -3667,6 +3664,9 @@
                 "quizId": {
                     "type": "integer"
                 },
+                "text": {
+                    "type": "string"
+                },
                 "updatedAt": {
                     "type": "string"
                 }
@@ -3675,8 +3675,8 @@
         "app_pkg_quiz_domain_entity.QuestionDTO": {
             "type": "object",
             "required": [
-                "content",
-                "quizId"
+                "quizId",
+                "text"
             ],
             "properties": {
                 "answers": {
@@ -3685,11 +3685,11 @@
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.AnswerDTO"
                     }
                 },
-                "content": {
-                    "type": "string"
-                },
                 "quizId": {
                     "type": "integer"
+                },
+                "text": {
+                    "type": "string"
                 }
             }
         },

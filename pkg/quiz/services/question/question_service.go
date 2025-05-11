@@ -54,8 +54,8 @@ func (s *questionService) FindAll(ctx context.Context, query entity.QuestionQuer
 // Create creates a new question
 func (s *questionService) Create(ctx context.Context, questionDTO entity.QuestionDTO) (*entity.Question, error) {
 	question := &entity.Question{
-		Content: questionDTO.Content,
-		QuizID:  questionDTO.QuizID,
+		Text:   questionDTO.Text,
+		QuizID: questionDTO.QuizID,
 	}
 
 	// Create answers if provided
@@ -99,7 +99,7 @@ func (s *questionService) Update(ctx context.Context, id uint, questionDTO entit
 		return nil, nil
 	}
 
-	question.Content = questionDTO.Content
+	question.Text = questionDTO.Text
 	question.QuizID = questionDTO.QuizID
 
 	// Handle answers update (simplified - in real implementation would need to handle deletions)

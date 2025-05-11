@@ -147,14 +147,14 @@ definitions:
         items:
           $ref: '#/definitions/app_pkg_quiz_domain_entity.Answer'
         type: array
-      content:
-        type: string
       createdAt:
         type: string
       id:
         type: integer
       quizId:
         type: integer
+      text:
+        type: string
       updatedAt:
         type: string
     type: object
@@ -164,13 +164,13 @@ definitions:
         items:
           $ref: '#/definitions/app_pkg_quiz_domain_entity.AnswerDTO'
         type: array
-      content:
-        type: string
       quizId:
         type: integer
+      text:
+        type: string
     required:
-    - content
     - quizId
+    - text
     type: object
   app_pkg_quiz_domain_entity.Quiz:
     properties:
