@@ -51,7 +51,6 @@ func (h *UserHandler) RegisterRoutes(app fiber.Router, authMiddleware *middlewar
 // @Failure 401 {object} error
 // @Failure 500 {object} error
 // @Security BearerAuth
-// @Security ApiKeyAuth
 // @Router /users [get]
 func (h *UserHandler) GetUsers(c *fiber.Ctx) error {
 	// Parse query parameters
@@ -95,7 +94,6 @@ func (h *UserHandler) GetUsers(c *fiber.Ctx) error {
 // @Failure 404 {object} error
 // @Failure 500 {object} error
 // @Security BearerAuth
-// @Security ApiKeyAuth
 // @Router /users/{id} [get]
 func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	// Parse user ID from URL
@@ -136,7 +134,6 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 // @Failure 409 {object} error
 // @Failure 500 {object} error
 // @Security BearerAuth
-// @Security ApiKeyAuth
 // @Router /users [post]
 func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	// Parse request body
@@ -173,7 +170,6 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 // @Failure 404 {object} error
 // @Failure 500 {object} error
 // @Security BearerAuth
-// @Security ApiKeyAuth
 // @Router /users/{id} [put]
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	// Parse user ID from URL
@@ -220,7 +216,6 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 // @Failure 404 {object} error
 // @Failure 500 {object} error
 // @Security BearerAuth
-// @Security ApiKeyAuth
 // @Router /users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	// Parse user ID from URL
