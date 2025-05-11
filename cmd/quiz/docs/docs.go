@@ -458,7 +458,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Create a new article with the provided information",
@@ -566,7 +566,7 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Update an article with the provided information",
@@ -683,7 +683,7 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Delete an article by its ID",
@@ -1057,7 +1057,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Create a new category with the provided information",
@@ -1236,7 +1236,7 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Update a category with the provided information",
@@ -1310,7 +1310,7 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Delete a category by its ID",
@@ -2692,7 +2692,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Create a new tag with the provided information",
@@ -2932,7 +2932,7 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Update a tag with the provided information",
@@ -3006,7 +3006,7 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "BearerAuth": []
                     }
                 ],
                 "description": "Delete a tag by its ID",
@@ -3062,9 +3062,6 @@ const docTemplate = `{
                 "security": [
                     {
                         "BearerAuth": []
-                    },
-                    {
-                        "ApiKeyAuth": []
                     }
                 ],
                 "description": "Get all users with pagination and filtering options",
@@ -3160,9 +3157,6 @@ const docTemplate = `{
                 "security": [
                     {
                         "BearerAuth": []
-                    },
-                    {
-                        "ApiKeyAuth": []
                     }
                 ],
                 "description": "Create a new user with the provided information",
@@ -3232,9 +3226,6 @@ const docTemplate = `{
                 "security": [
                     {
                         "BearerAuth": []
-                    },
-                    {
-                        "ApiKeyAuth": []
                     }
                 ],
                 "description": "Get details of a specific user by its ID",
@@ -3300,9 +3291,6 @@ const docTemplate = `{
                 "security": [
                     {
                         "BearerAuth": []
-                    },
-                    {
-                        "ApiKeyAuth": []
                     }
                 ],
                 "description": "Update a user with the provided information",
@@ -3377,9 +3365,6 @@ const docTemplate = `{
                 "security": [
                     {
                         "BearerAuth": []
-                    },
-                    {
-                        "ApiKeyAuth": []
                     }
                 ],
                 "description": "Delete a user by its ID",

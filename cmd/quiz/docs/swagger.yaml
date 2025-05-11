@@ -680,7 +680,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Create a new article
       tags:
       - articles
@@ -716,7 +716,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Delete an article
       tags:
       - articles
@@ -792,7 +792,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Update an existing article
       tags:
       - articles
@@ -1025,7 +1025,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Create a new category
       tags:
       - categories
@@ -1061,7 +1061,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Delete a category
       tags:
       - categories
@@ -1142,7 +1142,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Update an existing category
       tags:
       - categories
@@ -2030,7 +2030,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Create a new tag
       tags:
       - tags
@@ -2066,7 +2066,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Delete a tag
       tags:
       - tags
@@ -2147,7 +2147,7 @@ paths:
           description: Internal Server Error
           schema: {}
       security:
-      - ApiKeyAuth: []
+      - BearerAuth: []
       summary: Update an existing tag
       tags:
       - tags
@@ -2280,7 +2280,6 @@ paths:
           schema: {}
       security:
       - BearerAuth: []
-      - ApiKeyAuth: []
       summary: Get all users
       tags:
       - users
@@ -2322,7 +2321,6 @@ paths:
           schema: {}
       security:
       - BearerAuth: []
-      - ApiKeyAuth: []
       summary: Create a new user
       tags:
       - users
@@ -2359,7 +2357,6 @@ paths:
           schema: {}
       security:
       - BearerAuth: []
-      - ApiKeyAuth: []
       summary: Delete a user
       tags:
       - users
@@ -2400,7 +2397,6 @@ paths:
           schema: {}
       security:
       - BearerAuth: []
-      - ApiKeyAuth: []
       summary: Get user by ID
       tags:
       - users
@@ -2447,7 +2443,6 @@ paths:
           schema: {}
       security:
       - BearerAuth: []
-      - ApiKeyAuth: []
       summary: Update an existing user
       tags:
       - users
