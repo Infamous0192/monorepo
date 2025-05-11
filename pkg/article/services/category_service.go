@@ -56,18 +56,14 @@ func (s *categoryService) generateUniqueSlug(ctx context.Context, baseSlug strin
 	suffix := 1
 
 	for {
-		// Check if slug exists
-		category, err := s.categoryRepo.FindBySlug(ctx, uniqueSlug)
+		// Check if slug exists using count
+		count, err := s.categoryRepo.CountBySlug(ctx, uniqueSlug, excludeID)
 		if err != nil {
-			// If not found, slug is unique
-			if err.Error() == "Category not found" {
-				return uniqueSlug, nil
-			}
-			return "", err // Return other errors
+			return "", err
 		}
 
-		// If category found and it's the same as we're updating, slug is fine
-		if excludeID != nil && category.ID == *excludeID {
+		// If count is 0, slug is unique
+		if count == 0 {
 			return uniqueSlug, nil
 		}
 

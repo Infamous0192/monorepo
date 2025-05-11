@@ -232,3 +232,19 @@ func (r *tagRepository) Delete(ctx context.Context, id uint) error {
 
 	return nil
 }
+
+// CountBySlug counts tags with the given slug, excluding the specified ID if provided
+func (r *tagRepository) CountBySlug(ctx context.Context, slug string, excludeID *uint) (int64, error) {
+	var count int64
+	query := r.db.WithContext(ctx).Model(&entity.Tag{}).Where("slug = ?", slug)
+
+	if excludeID != nil {
+		query = query.Where("id != ?", *excludeID)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, exception.InternalError(fmt.Sprintf("Failed to count tags by slug: %v", err))
+	}
+
+	return count, nil
+}

@@ -30,6 +30,7 @@ func (r *articleRepository) FindOne(ctx context.Context, id uint) (*entity.Artic
 	result := r.db.WithContext(ctx).
 		Preload("Categories").
 		Preload("Tags").
+		Preload("Thumbnail").
 		First(&article, id)
 
 	if result.Error != nil {
@@ -49,6 +50,7 @@ func (r *articleRepository) FindBySlug(ctx context.Context, slug string) (*entit
 	result := r.db.WithContext(ctx).
 		Preload("Categories").
 		Preload("Tags").
+		Preload("Thumbnail").
 		Where("slug = ?", slug).
 		First(&article)
 
@@ -253,4 +255,20 @@ func (r *articleRepository) Publish(ctx context.Context, id uint, publishedAt *s
 	}
 
 	return nil
+}
+
+// CountBySlug counts articles with the given slug, excluding the specified ID if provided
+func (r *articleRepository) CountBySlug(ctx context.Context, slug string, excludeID *uint) (int64, error) {
+	var count int64
+	query := r.db.WithContext(ctx).Model(&entity.Article{}).Where("slug = ?", slug)
+
+	if excludeID != nil {
+		query = query.Where("id != ?", *excludeID)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, exception.InternalError(fmt.Sprintf("Failed to count articles by slug: %v", err))
+	}
+
+	return count, nil
 }

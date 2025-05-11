@@ -27,4 +27,7 @@ type TagRepository interface {
 
 	// Delete removes a tag
 	Delete(ctx context.Context, id uint) error
+
+	// CountBySlug counts tags with the given slug, excluding the specified ID if provided
+	CountBySlug(ctx context.Context, slug string, excludeID *uint) (int64, error)
 }

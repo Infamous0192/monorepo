@@ -58,18 +58,14 @@ func (s *articleService) generateUniqueSlug(ctx context.Context, baseSlug string
 	suffix := 1
 
 	for {
-		// Check if slug exists
-		article, err := s.articleRepo.FindBySlug(ctx, uniqueSlug)
+		// Check if slug exists using count
+		count, err := s.articleRepo.CountBySlug(ctx, uniqueSlug, excludeID)
 		if err != nil {
-			// If not found, slug is unique
-			if err.Error() == "Article not found" {
-				return uniqueSlug, nil
-			}
-			return "", err // Return other errors
+			return "", err
 		}
 
-		// If article found and it's the same as we're updating, slug is fine
-		if excludeID != nil && article.ID == *excludeID {
+		// If count is 0 or it's the same article we're updating, slug is unique
+		if count == 0 {
 			return uniqueSlug, nil
 		}
 

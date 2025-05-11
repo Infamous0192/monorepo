@@ -338,3 +338,19 @@ func (r *categoryRepository) Delete(ctx context.Context, id uint) error {
 
 	return nil
 }
+
+// CountBySlug counts categories with the given slug, excluding the specified ID if provided
+func (r *categoryRepository) CountBySlug(ctx context.Context, slug string, excludeID *uint) (int64, error) {
+	var count int64
+	query := r.db.WithContext(ctx).Model(&entity.Category{}).Where("slug = ?", slug)
+
+	if excludeID != nil {
+		query = query.Where("id != ?", *excludeID)
+	}
+
+	if err := query.Count(&count).Error; err != nil {
+		return 0, exception.InternalError(fmt.Sprintf("Failed to count categories by slug: %v", err))
+	}
+
+	return count, nil
+}

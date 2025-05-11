@@ -27,4 +27,7 @@ type ArticleRepository interface {
 
 	// Publish sets the published status of an article
 	Publish(ctx context.Context, id uint, publishedAt *string) error
+
+	// CountBySlug counts articles with the given slug, excluding the specified ID if provided
+	CountBySlug(ctx context.Context, slug string, excludeID *uint) (int64, error)
 }
