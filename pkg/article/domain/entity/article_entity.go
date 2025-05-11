@@ -14,10 +14,10 @@ type Article struct {
 	Slug        string     `json:"slug" gorm:"uniqueIndex"`
 	PublishedAt *time.Time `json:"publishedAt,omitempty" gorm:"column:published_at"`
 	ThumbnailID *uint      `json:"thumbnailId,omitempty"`
-	Thumbnail   *File      `json:"thumbnail" gorm:"foreignKey:ThumbnailID"`
+	Thumbnail   *File      `json:"thumbnail" gorm:"foreignKey:ThumbnailID;constraint:OnDelete:SET NULL"`
 
-	Categories []*Category `json:"categories" gorm:"many2many:article_categories;"`
-	Tags       []*Tag      `json:"tags" gorm:"many2many:article_tags;"`
+	Categories []*Category `json:"categories" gorm:"many2many:article_categories;constraint:OnDelete:CASCADE"`
+	Tags       []*Tag      `json:"tags" gorm:"many2many:article_tags;constraint:OnDelete:CASCADE"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`

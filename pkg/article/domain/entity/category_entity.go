@@ -14,11 +14,11 @@ type Category struct {
 
 	// Self-referencing relationship for nested categories
 	ParentID *uint       `json:"parentId,omitempty" gorm:"column:parent_id;index"`
-	Parent   *Category   `json:"-" gorm:"foreignKey:ParentID" swaggerignore:"true"`
-	Children []*Category `json:"-" gorm:"foreignKey:ParentID" swaggerignore:"true"`
+	Parent   *Category   `json:"-" gorm:"foreignKey:ParentID;constraint:OnDelete:SET NULL" swaggerignore:"true"`
+	Children []*Category `json:"-" gorm:"foreignKey:ParentID;constraint:OnDelete:CASCADE" swaggerignore:"true"`
 
 	// Many-to-many relationship with articles
-	Articles []*Article `json:"-" gorm:"many2many:article_categories;"`
+	Articles []*Article `json:"-" gorm:"many2many:article_categories;constraint:OnDelete:CASCADE"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
