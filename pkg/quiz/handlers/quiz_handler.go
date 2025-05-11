@@ -148,17 +148,26 @@ func (h *QuizHandler) CreateQuiz(c *fiber.Ctx) error {
 	quiz, err := h.quizService.Create(c.Context(), *quizDTO)
 	if err != nil {
 		fmt.Printf("Handler: Error from service layer: %v\n", err)
-		return err
+		return exception.InternalError(fmt.Sprintf("Failed to create quiz: %v", err))
 	}
 
 	fmt.Printf("Handler: Quiz created successfully: %+v\n", quiz)
 
-	// Return response
-	return c.Status(fiber.StatusCreated).JSON(http.GeneralResponse{
+	// Return response with explicit content type
+	c.Set("Content-Type", "application/json")
+	response := http.GeneralResponse{
 		Status:  fiber.StatusCreated,
 		Message: "Quiz created successfully",
 		Data:    quiz,
-	})
+	}
+	fmt.Printf("Handler: Sending response: %+v\n", response)
+
+	if err := c.Status(fiber.StatusCreated).JSON(response); err != nil {
+		fmt.Printf("Handler: Error sending response: %v\n", err)
+		return exception.InternalError(fmt.Sprintf("Failed to send response: %v", err))
+	}
+
+	return nil
 }
 
 // UpdateQuiz updates an existing quiz
