@@ -26,14 +26,12 @@ func NewAuthHandler(authService auth.AuthService, validation *validation.Validat
 }
 
 // RegisterRoutes registers all routes for authentication handling
-func (h *AuthHandler) RegisterRoutes(app fiber.Router) {
+func (h *AuthHandler) RegisterRoutes(app fiber.Router, authMiddleware *middleware.AuthMiddleware) {
 	// Public routes (no authentication required)
 	auth := app.Group("/auth")
 	auth.Post("/register", h.Register)
 	auth.Post("/login", h.Login)
 
-	// Protected routes (authentication required)
-	authMiddleware := middleware.NewAuthMiddleware(h.authService)
 	auth.Get("/verify", authMiddleware.RequireAuth(), h.Verify)
 }
 

@@ -185,7 +185,7 @@ func main() {
 	answerHandler.RegisterRoutes(api, authMiddleware)
 	submissionHandler.RegisterRoutes(api, authMiddleware)
 	userHandler.RegisterRoutes(api, authMiddleware)
-	authHandler.RegisterRoutes(api)
+	authHandler.RegisterRoutes(api, authMiddleware)
 
 	// Start server
 	go func() {
