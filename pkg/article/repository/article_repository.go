@@ -103,6 +103,7 @@ func (r *articleRepository) FindAll(ctx context.Context, query entity.ArticleQue
 	result := db.
 		Preload("Categories").
 		Preload("Tags").
+		Preload("Thumbnail").
 		Limit(query.GetLimit()).
 		Offset(query.GetOffset()).
 		Order("created_at DESC").
