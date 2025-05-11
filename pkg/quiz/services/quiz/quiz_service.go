@@ -5,7 +5,6 @@ import (
 	"app/pkg/quiz/domain/repository"
 	"app/pkg/types/pagination"
 	"context"
-	"fmt"
 )
 
 type quizService struct {
@@ -54,23 +53,15 @@ func (s *quizService) FindAll(ctx context.Context, query entity.QuizQuery) (*pag
 
 // Create creates a new quiz
 func (s *quizService) Create(ctx context.Context, quizDTO entity.QuizDTO) (*entity.Quiz, error) {
-	// Log incoming DTO
-	fmt.Printf("Creating quiz with DTO: %+v\n", quizDTO)
-
 	quiz := &entity.Quiz{
 		Name:        quizDTO.Name,
 		Description: quizDTO.Description,
 	}
 
-	// Log quiz entity before creation
-	fmt.Printf("Quiz entity before creation: %+v\n", quiz)
-
 	if err := s.quizRepo.Create(ctx, quiz); err != nil {
-		fmt.Printf("Error creating quiz: %v\n", err)
 		return nil, err
 	}
 
-	fmt.Printf("Quiz created successfully: %+v\n", quiz)
 	return quiz, nil
 }
 

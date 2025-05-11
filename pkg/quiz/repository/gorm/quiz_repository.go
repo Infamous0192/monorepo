@@ -5,7 +5,6 @@ import (
 	"app/pkg/quiz/domain/repository"
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"gorm.io/gorm"
@@ -18,20 +17,6 @@ type QuizRepository struct {
 
 // NewQuizRepository creates a new GORM quiz repository
 func NewQuizRepository(db *gorm.DB) repository.QuizRepository {
-	// Verify database connection
-	sqlDB, err := db.DB()
-	if err != nil {
-		log.Printf("Failed to get database instance: %v\n", err)
-		return nil
-	}
-
-	if err := sqlDB.Ping(); err != nil {
-		log.Printf("Failed to ping database: %v\n", err)
-		return nil
-	}
-
-	log.Println("Database connection verified successfully")
-
 	return &QuizRepository{
 		db: db,
 	}
@@ -86,14 +71,7 @@ func (r *QuizRepository) FindAll(ctx context.Context, query entity.QuizQuery) ([
 
 // Create stores a new quiz
 func (r *QuizRepository) Create(ctx context.Context, quiz *entity.Quiz) error {
-	fmt.Printf("Repository: Creating quiz: %+v\n", quiz)
-	err := r.db.WithContext(ctx).Create(quiz).Error
-	if err != nil {
-		fmt.Printf("Repository: Error creating quiz: %v\n", err)
-		return err
-	}
-	fmt.Printf("Repository: Quiz created successfully: %+v\n", quiz)
-	return nil
+	return r.db.WithContext(ctx).Create(quiz).Error
 }
 
 // Update modifies an existing quiz

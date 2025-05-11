@@ -7,7 +7,6 @@ import (
 	"app/pkg/quiz/services/quiz"
 	"app/pkg/types/http"
 	"app/pkg/validation"
-	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -133,25 +132,17 @@ func (h *QuizHandler) GetQuiz(c *fiber.Ctx) error {
 // @Security BearerAuth
 // @Router /quizzes [post]
 func (h *QuizHandler) CreateQuiz(c *fiber.Ctx) error {
-	fmt.Printf("Handler: Received CreateQuiz request with body: %s\n", string(c.Body()))
-
 	// Parse request body
 	quizDTO := new(entity.QuizDTO)
 	if err := h.validation.Body(quizDTO, c); err != nil {
-		fmt.Printf("Handler: Validation error: %v\n", err)
 		return err
 	}
-
-	fmt.Printf("Handler: Validation passed, creating quiz with DTO: %+v\n", quizDTO)
 
 	// Create quiz using service
 	quiz, err := h.quizService.Create(c.Context(), *quizDTO)
 	if err != nil {
-		fmt.Printf("Handler: Error from service layer: %v\n", err)
 		return err
 	}
-
-	fmt.Printf("Handler: Quiz created successfully: %+v\n", quiz)
 
 	// Return response
 	return c.Status(fiber.StatusCreated).JSON(http.GeneralResponse{
