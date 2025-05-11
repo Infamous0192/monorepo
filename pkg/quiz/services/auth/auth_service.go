@@ -25,11 +25,14 @@ type AuthService interface {
 	// Register creates a new user account
 	Register(registerDTO *entity.RegisterDTO) (*entity.User, error)
 
-	// Login authenticates a user and returns a JWT token
-	Login(username, password string) (string, error)
+	// Login authenticates a user and returns a JWT token and user data
+	Login(username, password string) (string, *entity.User, error)
 
 	// ValidateToken validates a JWT token and returns the claims
 	ValidateToken(tokenString string) (*Claims, error)
+
+	// GetUserByID retrieves a user by their ID
+	GetUserByID(id uint) (*entity.User, error)
 
 	// HashPassword creates a bcrypt hash of the password
 	HashPassword(password string) (string, error)
@@ -90,14 +93,14 @@ func (s *authService) Register(registerDTO *entity.RegisterDTO) (*entity.User, e
 }
 
 // Login authenticates a user and returns a JWT token
-func (s *authService) Login(username, password string) (string, error) {
+func (s *authService) Login(username, password string) (string, *entity.User, error) {
 	// Get user by username
 	user, err := s.userRepo.GetByUsername(username)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	if user == nil {
-		return "", exception.InvalidPayload(map[string]string{
+		return "", nil, exception.InvalidPayload(map[string]string{
 			"username": "Username not found",
 		})
 	}
@@ -105,14 +108,14 @@ func (s *authService) Login(username, password string) (string, error) {
 	// Check password
 	err = s.CheckPassword(password, user.Password)
 	if err != nil {
-		return "", exception.InvalidPayload(map[string]string{
+		return "", nil, exception.InvalidPayload(map[string]string{
 			"password": "Incorrect password",
 		})
 	}
 
 	// Check if user is active
 	if !user.Status {
-		return "", exception.Http(403, "Account is inactive")
+		return "", nil, exception.Http(403, "Account is inactive")
 	}
 
 	// Generate token
@@ -131,10 +134,10 @@ func (s *authService) Login(username, password string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(s.config.JWTSecret))
 	if err != nil {
-		return "", exception.InternalError("Failed to generate token")
+		return "", nil, exception.InternalError("Failed to generate token")
 	}
 
-	return tokenString, nil
+	return tokenString, user, nil
 }
 
 // ValidateToken validates a JWT token and returns the claims
@@ -155,6 +158,18 @@ func (s *authService) ValidateToken(tokenString string) (*Claims, error) {
 	}
 
 	return nil, exception.Http(401, "Invalid token claims")
+}
+
+// GetUserByID retrieves a user by their ID
+func (s *authService) GetUserByID(id uint) (*entity.User, error) {
+	user, err := s.userRepo.Get(id)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, exception.Http(404, "User not found")
+	}
+	return user, nil
 }
 
 // HashPassword creates a bcrypt hash of the password

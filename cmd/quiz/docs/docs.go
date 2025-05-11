@@ -829,9 +829,7 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "type": "object",
-                                            "additionalProperties": {
-                                                "type": "string"
-                                            }
+                                            "additionalProperties": true
                                         }
                                     }
                                 }
@@ -930,7 +928,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Verify the current user's authentication token",
+                "description": "Verify the current user's authentication token and return user information",
                 "consumes": [
                     "application/json"
                 ],
@@ -953,7 +951,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/app_pkg_quiz_services_auth.Claims"
+                                            "$ref": "#/definitions/app_pkg_quiz_domain_entity.User"
                                         }
                                     }
                                 }
@@ -3878,63 +3876,6 @@ const docTemplate = `{
                 }
             }
         },
-        "app_pkg_quiz_services_auth.Claims": {
-            "type": "object",
-            "properties": {
-                "aud": {
-                    "description": "the ` + "`" + `aud` + "`" + ` (Audience) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "exp": {
-                    "description": "the ` + "`" + `exp` + "`" + ` (Expiration Time) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/jwt.NumericDate"
-                        }
-                    ]
-                },
-                "iat": {
-                    "description": "the ` + "`" + `iat` + "`" + ` (Issued At) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/jwt.NumericDate"
-                        }
-                    ]
-                },
-                "iss": {
-                    "description": "the ` + "`" + `iss` + "`" + ` (Issuer) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1",
-                    "type": "string"
-                },
-                "jti": {
-                    "description": "the ` + "`" + `jti` + "`" + ` (JWT ID) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7",
-                    "type": "string"
-                },
-                "nbf": {
-                    "description": "the ` + "`" + `nbf` + "`" + ` (Not Before) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/jwt.NumericDate"
-                        }
-                    ]
-                },
-                "role": {
-                    "type": "string"
-                },
-                "sub": {
-                    "description": "the ` + "`" + `sub` + "`" + ` (Subject) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2",
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "http.GeneralResponse": {
             "type": "object",
             "properties": {
@@ -3956,14 +3897,6 @@ const docTemplate = `{
                 "result": {
                     "type": "array",
                     "items": {}
-                }
-            }
-        },
-        "jwt.NumericDate": {
-            "type": "object",
-            "properties": {
-                "time.Time": {
-                    "type": "string"
                 }
             }
         },

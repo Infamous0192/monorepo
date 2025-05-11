@@ -295,41 +295,6 @@ definitions:
     - status
     - username
     type: object
-  app_pkg_quiz_services_auth.Claims:
-    properties:
-      aud:
-        description: the `aud` (Audience) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3
-        items:
-          type: string
-        type: array
-      exp:
-        allOf:
-        - $ref: '#/definitions/jwt.NumericDate'
-        description: the `exp` (Expiration Time) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4
-      iat:
-        allOf:
-        - $ref: '#/definitions/jwt.NumericDate'
-        description: the `iat` (Issued At) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6
-      iss:
-        description: the `iss` (Issuer) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1
-        type: string
-      jti:
-        description: the `jti` (JWT ID) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7
-        type: string
-      nbf:
-        allOf:
-        - $ref: '#/definitions/jwt.NumericDate'
-        description: the `nbf` (Not Before) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5
-      role:
-        type: string
-      sub:
-        description: the `sub` (Subject) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2
-        type: string
-      userId:
-        type: integer
-      username:
-        type: string
-    type: object
   http.GeneralResponse:
     properties:
       data: {}
@@ -345,11 +310,6 @@ definitions:
       result:
         items: {}
         type: array
-    type: object
-  jwt.NumericDate:
-    properties:
-      time.Time:
-        type: string
     type: object
   pagination.Metadata:
     properties:
@@ -894,8 +854,7 @@ paths:
             - $ref: '#/definitions/http.GeneralResponse'
             - properties:
                 data:
-                  additionalProperties:
-                    type: string
+                  additionalProperties: true
                   type: object
               type: object
         "400":
@@ -956,7 +915,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Verify the current user's authentication token
+      description: Verify the current user's authentication token and return user
+        information
       produces:
       - application/json
       responses:
@@ -967,7 +927,7 @@ paths:
             - $ref: '#/definitions/http.GeneralResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/app_pkg_quiz_services_auth.Claims'
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
               type: object
         "401":
           description: Unauthorized

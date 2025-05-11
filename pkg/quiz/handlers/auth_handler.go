@@ -75,7 +75,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param credentials body entity.LoginDTO true "Login credentials"
-// @Success 200 {object} http.GeneralResponse{data=map[string]string}
+// @Success 200 {object} http.GeneralResponse{data=map[string]interface{}}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
@@ -88,28 +88,29 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	}
 
 	// Login the user
-	token, err := h.authService.Login(loginDTO.Username, loginDTO.Password)
+	token, user, err := h.authService.Login(loginDTO.Username, loginDTO.Password)
 	if err != nil {
 		return err
 	}
 
-	// Return the JWT token
+	// Return the JWT token and user credentials
 	return c.JSON(http.GeneralResponse{
 		Status:  fiber.StatusOK,
 		Message: "Login successful",
 		Data: fiber.Map{
 			"token": token,
+			"creds": user,
 		},
 	})
 }
 
 // Verify verifies the current user's authentication token
 // @Summary Verify authentication token
-// @Description Verify the current user's authentication token
+// @Description Verify the current user's authentication token and return user information
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} http.GeneralResponse{data=auth.Claims}
+// @Success 200 {object} http.GeneralResponse{data=entity.User}
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
 // @Security BearerAuth
@@ -121,9 +122,15 @@ func (h *AuthHandler) Verify(c *fiber.Ctx) error {
 		return exception.Http(401, "User not authenticated")
 	}
 
+	// Get user data
+	user, err := h.authService.GetUserByID(claims.UserID)
+	if err != nil {
+		return err
+	}
+
 	return c.JSON(http.GeneralResponse{
 		Status:  fiber.StatusOK,
 		Message: "Token verified successfully",
-		Data:    claims,
+		Data:    user,
 	})
 }
