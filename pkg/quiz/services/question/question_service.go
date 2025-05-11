@@ -5,16 +5,22 @@ import (
 	"app/pkg/quiz/domain/repository"
 	"app/pkg/types/pagination"
 	"context"
+	"slices"
 )
 
 type questionService struct {
 	questionRepo repository.QuestionRepository
+	answerRepo   repository.AnswerRepository
 }
 
 // NewQuestionService creates a new instance of QuestionService
-func NewQuestionService(questionRepo repository.QuestionRepository) QuestionService {
+func NewQuestionService(
+	questionRepo repository.QuestionRepository,
+	answerRepo repository.AnswerRepository,
+) QuestionService {
 	return &questionService{
 		questionRepo: questionRepo,
+		answerRepo:   answerRepo,
 	}
 }
 
@@ -70,18 +76,6 @@ func (s *questionService) Create(ctx context.Context, questionDTO entity.Questio
 		question.Answers = answers
 	}
 
-	// Create answers if provided
-	if len(questionDTO.Answers) > 0 {
-		answers := make([]entity.Answer, len(questionDTO.Answers))
-		for i, answerDTO := range questionDTO.Answers {
-			answers[i] = entity.Answer{
-				Text:  answerDTO.Text,
-				Value: *answerDTO.Value,
-			}
-		}
-		question.Answers = answers
-	}
-
 	if err := s.questionRepo.Create(ctx, question); err != nil {
 		return nil, err
 	}
@@ -102,32 +96,91 @@ func (s *questionService) Update(ctx context.Context, id uint, questionDTO entit
 	question.Text = questionDTO.Text
 	question.QuizID = questionDTO.QuizID
 
-	// Handle answers update (simplified - in real implementation would need to handle deletions)
+	// Process answers - updating existing ones and adding new ones
 	if len(questionDTO.Answers) > 0 {
-		answers := make([]entity.Answer, len(questionDTO.Answers))
-		for i, answerDTO := range questionDTO.Answers {
-			answers[i] = entity.Answer{
-				Text:       answerDTO.Text,
-				Value:      *answerDTO.Value,
-				QuestionID: id,
+		// Create a map of existing answers by ID for quick lookup
+		existingAnswers := make(map[uint]entity.Answer)
+		var answersToKeep []uint
+
+		for _, answer := range question.Answers {
+			existingAnswers[answer.ID] = answer
+		}
+
+		// Process each answer from DTO
+		updatedAnswers := make([]entity.Answer, 0, len(questionDTO.Answers))
+
+		for _, answerDTO := range questionDTO.Answers {
+			// If answer has ID and exists, update it
+			if answerDTO.ID != nil && *answerDTO.ID > 0 {
+				if _, exists := existingAnswers[*answerDTO.ID]; exists {
+					// Update the answer using the answer repository
+					updatedAnswer := &entity.Answer{
+						ID:         *answerDTO.ID,
+						Text:       answerDTO.Text,
+						Value:      *answerDTO.Value,
+						QuestionID: id,
+					}
+					if err := s.answerRepo.Update(ctx, updatedAnswer); err != nil {
+						return nil, err
+					}
+
+					updatedAnswers = append(updatedAnswers, *updatedAnswer)
+					answersToKeep = append(answersToKeep, *answerDTO.ID)
+				} else {
+					// ID provided but not found - create new with specified ID
+					newAnswer := entity.Answer{
+						ID:         *answerDTO.ID,
+						Text:       answerDTO.Text,
+						Value:      *answerDTO.Value,
+						QuestionID: id,
+					}
+
+					if err := s.answerRepo.Create(ctx, &newAnswer); err != nil {
+						return nil, err
+					}
+
+					updatedAnswers = append(updatedAnswers, newAnswer)
+					answersToKeep = append(answersToKeep, *answerDTO.ID)
+				}
+			} else {
+				// No ID provided, create new
+				newAnswer := entity.Answer{
+					Text:       answerDTO.Text,
+					Value:      *answerDTO.Value,
+					QuestionID: id,
+				}
+
+				if err := s.answerRepo.Create(ctx, &newAnswer); err != nil {
+					return nil, err
+				}
+
+				updatedAnswers = append(updatedAnswers, newAnswer)
 			}
 		}
-		question.Answers = answers
-	}
 
-	// Handle answers update (simplified)
-	if len(questionDTO.Answers) > 0 {
-		answers := make([]entity.Answer, len(questionDTO.Answers))
-		for i, answerDTO := range questionDTO.Answers {
-			answers[i] = entity.Answer{
-				Text:       answerDTO.Text,
-				Value:      *answerDTO.Value,
-				QuestionID: id,
+		// Delete answers that are not in the updated list
+		for answerID := range existingAnswers {
+			shouldDelete := !slices.Contains(answersToKeep, answerID)
+
+			if shouldDelete {
+				if err := s.answerRepo.Delete(ctx, answerID); err != nil {
+					return nil, err
+				}
 			}
 		}
-		question.Answers = answers
+
+		question.Answers = updatedAnswers
+	} else {
+		// If no answers provided, delete all existing by finding answers with this question ID
+		for _, answer := range question.Answers {
+			if err := s.answerRepo.Delete(ctx, answer.ID); err != nil {
+				return nil, err
+			}
+		}
+		question.Answers = []entity.Answer{} // Set empty slice to avoid nil
 	}
 
+	// Update question data without affecting answers
 	if err := s.questionRepo.Update(ctx, question); err != nil {
 		return nil, err
 	}

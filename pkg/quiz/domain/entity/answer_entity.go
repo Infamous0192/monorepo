@@ -20,6 +20,7 @@ type Answer struct {
 
 // AnswerDTO represents the data transfer object for creating or updating an answer
 type AnswerDTO struct {
+	ID       *uint  `json:"id,omitempty" form:"id"`
 	Text     string `json:"text" form:"text" validate:"required"`
 	Value    *int32 `json:"value" form:"value" validate:"required"`
 	Question uint   `json:"question" form:"question" validate:"omitempty"`

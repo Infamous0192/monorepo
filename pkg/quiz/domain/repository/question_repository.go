@@ -21,4 +21,10 @@ type QuestionRepository interface {
 
 	// Delete removes a question
 	Delete(ctx context.Context, id uint) error
+
+	// DeleteAnswers removes all answers for a question
+	DeleteAnswers(ctx context.Context, questionID uint) error
+
+	// DeleteAnswer removes a single answer by ID
+	DeleteAnswer(ctx context.Context, answerID uint) error
 }

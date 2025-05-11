@@ -114,7 +114,7 @@ func main() {
 
 	// Initialize quiz services
 	quizService := quizServices.NewQuizService(quizRepo)
-	questionService := quizServices.NewQuestionService(questionRepo)
+	questionService := quizServices.NewQuestionService(questionRepo, answerRepo)
 	answerService := quizServices.NewAnswerService(answerRepo)
 	submissionService := quizServices.NewSubmissionService(submissionRepo)
 	userService := quizServices.NewUserService(userRepo)

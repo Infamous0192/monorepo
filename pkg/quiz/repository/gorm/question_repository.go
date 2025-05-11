@@ -87,3 +87,13 @@ func (r *QuestionRepository) Update(ctx context.Context, question *entity.Questi
 func (r *QuestionRepository) Delete(ctx context.Context, id uint) error {
 	return r.db.WithContext(ctx).Delete(&entity.Question{}, id).Error
 }
+
+// DeleteAnswers removes all answers for a question
+func (r *QuestionRepository) DeleteAnswers(ctx context.Context, questionID uint) error {
+	return r.db.WithContext(ctx).Where("question_id = ?", questionID).Delete(&entity.Answer{}).Error
+}
+
+// DeleteAnswer removes a single answer by ID
+func (r *QuestionRepository) DeleteAnswer(ctx context.Context, answerID uint) error {
+	return r.db.WithContext(ctx).Delete(&entity.Answer{}, answerID).Error
+}

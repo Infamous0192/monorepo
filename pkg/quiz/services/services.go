@@ -15,8 +15,8 @@ func NewAnswerService(answerRepo repository.AnswerRepository) answer.AnswerServi
 	return answer.NewAnswerService(answerRepo)
 }
 
-func NewQuestionService(questionRepo repository.QuestionRepository) question.QuestionService {
-	return question.NewQuestionService(questionRepo)
+func NewQuestionService(questionRepo repository.QuestionRepository, answerRepo repository.AnswerRepository) question.QuestionService {
+	return question.NewQuestionService(questionRepo, answerRepo)
 }
 
 func NewQuizService(quizRepo repository.QuizRepository) quiz.QuizService {
