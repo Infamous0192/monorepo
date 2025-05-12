@@ -42,6 +42,7 @@ func (h *ArticleHandler) RegisterRoutes(app fiber.Router, authMiddleware fiber.H
 	// Public routes (no API key required)
 	api.Get("/", h.GetArticles)
 	api.Get("/:id", h.GetArticle)
+	api.Get("/slug/:slug", h.GetArticleBySlug)
 	api.Get("/files/:filename", h.ServeFile)
 
 	// Protected routes (API key required)
@@ -112,7 +113,37 @@ func (h *ArticleHandler) GetArticles(c *fiber.Ctx) error {
 	})
 }
 
-// GetArticle returns a single article by its slug
+// GetArticle returns a single article by its id
+// @Summary Get article by id
+// @Description Get details of a specific article by its id
+// @Tags articles
+// @Accept json
+// @Produce json
+// @Param id path int true "Article id"
+// @Success 200 {object} http.GeneralResponse{data=entity.Article}
+// @Failure 400 {object} validation.ValidationError
+// @Failure 404 {object} error
+// @Failure 500 {object} error
+// @Router /articles/{id} [get]
+func (h *ArticleHandler) GetArticle(c *fiber.Ctx) error {
+	id, err := h.validation.ParamsInt(c)
+	if err != nil {
+		return err
+	}
+
+	article, err := h.articleService.Get(c.Context(), uint(id))
+	if err != nil {
+		return err
+	}
+
+	return c.Status(fiber.StatusOK).JSON(http.GeneralResponse{
+		Status:  fiber.StatusOK,
+		Message: "Article retrieved successfully",
+		Data:    article,
+	})
+}
+
+// GetArticleBySlug returns a single article by its slug
 // @Summary Get article by slug
 // @Description Get details of a specific article by its slug
 // @Tags articles
@@ -123,16 +154,9 @@ func (h *ArticleHandler) GetArticles(c *fiber.Ctx) error {
 // @Failure 400 {object} validation.ValidationError
 // @Failure 404 {object} error
 // @Failure 500 {object} error
-// @Router /articles/{slug} [get]
-func (h *ArticleHandler) GetArticle(c *fiber.Ctx) error {
+// @Router /articles/slug/{slug} [get]
+func (h *ArticleHandler) GetArticleBySlug(c *fiber.Ctx) error {
 	slug := c.Params("slug")
-	if err := h.validation.Field(slug, "required"); err != nil {
-		return validation.ValidationError{
-			Errors: map[string]string{
-				"slug": err.Error(),
-			},
-		}
-	}
 
 	article, err := h.articleService.GetBySlug(c.Context(), slug)
 	if err != nil {

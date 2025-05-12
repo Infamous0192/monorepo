@@ -562,7 +562,121 @@ const docTemplate = `{
                 }
             }
         },
+        "/articles/slug/{slug}": {
+            "get": {
+                "description": "Get details of a specific article by its slug",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "summary": "Get article by slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Article slug",
+                        "name": "slug",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.GeneralResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/app_pkg_article_domain_entity.Article"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/validation.ValidationError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/articles/{id}": {
+            "get": {
+                "description": "Get details of a specific article by its id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "summary": "Get article by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/http.GeneralResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/app_pkg_article_domain_entity.Article"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/validation.ValidationError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
             "put": {
                 "security": [
                     {
@@ -722,64 +836,6 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {}
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {}
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/articles/{slug}": {
-            "get": {
-                "description": "Get details of a specific article by its slug",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "articles"
-                ],
-                "summary": "Get article by slug",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Article slug",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/http.GeneralResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/app_pkg_article_domain_entity.Article"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/validation.ValidationError"
-                        }
                     },
                     "404": {
                         "description": "Not Found",

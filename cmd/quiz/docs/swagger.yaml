@@ -722,6 +722,41 @@ paths:
       summary: Delete an article
       tags:
       - articles
+    get:
+      consumes:
+      - application/json
+      description: Get details of a specific article by its id
+      parameters:
+      - description: Article id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/http.GeneralResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/app_pkg_article_domain_entity.Article'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/validation.ValidationError'
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Get article by id
+      tags:
+      - articles
     put:
       consumes:
       - multipart/form-data
@@ -798,7 +833,7 @@ paths:
       summary: Update an existing article
       tags:
       - articles
-  /articles/{slug}:
+  /articles/slug/{slug}:
     get:
       consumes:
       - application/json
