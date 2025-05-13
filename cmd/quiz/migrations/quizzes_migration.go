@@ -35,6 +35,26 @@ func SetupQuizDatabase(db *gorm.DB) error {
 		log.Printf("Warning: Failed to seed user data: %v", err)
 	}
 
+	// Seed SDQ quiz data for children 4-10 years
+	if err := SeedSDQQuiz(db); err != nil {
+		log.Printf("Warning: Failed to seed SDQ quiz data: %v", err)
+	}
+
+	// Seed SDQ quiz data for children 11-18 years
+	if err := SeedSDQTeenQuiz(db); err != nil {
+		log.Printf("Warning: Failed to seed SDQ teen quiz data: %v", err)
+	}
+
+	// Seed TB quiz data
+	if err := SeedTBQuiz(db); err != nil {
+		log.Printf("Warning: Failed to seed TB quiz data: %v", err)
+	}
+
+	// Seed Eating Habits quiz data
+	if err := SeedEatingHabitsQuiz(db); err != nil {
+		log.Printf("Warning: Failed to seed Eating Habits quiz data: %v", err)
+	}
+
 	log.Println("Quiz database migration completed successfully")
 	return nil
 }
@@ -64,113 +84,6 @@ func seedQuizData(db *gorm.DB) error {
 	}
 
 	if err := db.Create(quiz).Error; err != nil {
-		return err
-	}
-
-	// Create questions for the quiz
-	questions := []entity.Question{
-		{
-			QuizID:    quiz.ID,
-			Text:      "What does HTML stand for?",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
-		{
-			QuizID:    quiz.ID,
-			Text:      "Which language is used for styling web pages?",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
-		{
-			QuizID:    quiz.ID,
-			Text:      "Which of the following are JavaScript frameworks?",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
-	}
-
-	if err := db.Create(&questions).Error; err != nil {
-		return err
-	}
-
-	// Create options for each question
-	options := []entity.Answer{
-		// Options for question 1
-		{
-			QuestionID: questions[0].ID,
-			Text:       "Hyper Text Markup Language",
-			Value:      1,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		{
-			QuestionID: questions[0].ID,
-			Text:       "High Tech Multi Language",
-			Value:      0,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		{
-			QuestionID: questions[0].ID,
-			Text:       "Hyper Transfer Markup Language",
-			Value:      0,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		// Options for question 2
-		{
-			QuestionID: questions[1].ID,
-			Text:       "HTML",
-			Value:      1,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		{
-			QuestionID: questions[1].ID,
-			Text:       "CSS",
-			Value:      0,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		{
-			QuestionID: questions[1].ID,
-			Text:       "JavaScript",
-			Value:      0,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		// Options for question 3
-		{
-			QuestionID: questions[2].ID,
-			Text:       "React",
-			Value:      1,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		{
-			QuestionID: questions[2].ID,
-			Text:       "Angular",
-			Value:      0,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		{
-			QuestionID: questions[2].ID,
-			Text:       "Python",
-			Value:      0,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-		{
-			QuestionID: questions[2].ID,
-			Text:       "Vue",
-			Value:      0,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-		},
-	}
-
-	if err := db.Create(&options).Error; err != nil {
 		return err
 	}
 
