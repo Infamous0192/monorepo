@@ -273,7 +273,7 @@ func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
 	var dto entity.ArticleDTO
 
 	// Parse article data from form field
-	if err := h.validation.FormValue(&dto, "article", c); err != nil {
+	if err := h.validation.Body(&dto, c); err != nil {
 		return err
 	}
 
