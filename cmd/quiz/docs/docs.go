@@ -1557,6 +1557,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "description": "Filter by category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Search keyword",
                         "name": "keyword",
                         "in": "query"
@@ -3709,6 +3715,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.Answer"
                     }
                 },
+                "category": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -3738,6 +3747,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.AnswerDTO"
                     }
+                },
+                "category": {
+                    "type": "string"
                 },
                 "quizId": {
                     "type": "integer"

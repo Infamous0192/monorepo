@@ -7,9 +7,10 @@ import (
 
 // Question represents a quiz question entity
 type Question struct {
-	ID     uint   `json:"id" gorm:"primarykey, autoIncrement"`
-	Text   string `json:"text"`
-	QuizID uint   `json:"quizId" gorm:"column:quiz_id"`
+	ID       uint   `json:"id" gorm:"primarykey, autoIncrement"`
+	Text     string `json:"text"`
+	QuizID   uint   `json:"quizId" gorm:"column:quiz_id"`
+	Category string `json:"category,omitempty" gorm:"column:category"`
 
 	Answers []Answer `json:"answers" gorm:"constraint:OnDelete:CASCADE"`
 
@@ -19,16 +20,18 @@ type Question struct {
 
 // QuestionDTO represents the data transfer object for creating or updating a question
 type QuestionDTO struct {
-	Text    string      `json:"text" validate:"required"`
-	QuizID  uint        `json:"quizId" validate:"required"`
-	Answers []AnswerDTO `json:"answers" validate:"omitempty,dive"`
+	Text     string      `json:"text" validate:"required"`
+	QuizID   uint        `json:"quizId" validate:"required"`
+	Category string      `json:"category,omitempty"`
+	Answers  []AnswerDTO `json:"answers" validate:"omitempty,dive"`
 }
 
 // QuestionQuery represents the query parameters for filtering questions
 type QuestionQuery struct {
 	pagination.Pagination
-	QuizID  uint   `query:"quizId"`
-	Keyword string `query:"keyword"`
+	QuizID   uint   `query:"quizId"`
+	Keyword  string `query:"keyword"`
+	Category string `query:"category"`
 }
 
 // GetLimit returns the pagination limit or default value

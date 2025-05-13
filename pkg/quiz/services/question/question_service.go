@@ -60,8 +60,9 @@ func (s *questionService) FindAll(ctx context.Context, query entity.QuestionQuer
 // Create creates a new question
 func (s *questionService) Create(ctx context.Context, questionDTO entity.QuestionDTO) (*entity.Question, error) {
 	question := &entity.Question{
-		Text:   questionDTO.Text,
-		QuizID: questionDTO.QuizID,
+		Text:     questionDTO.Text,
+		QuizID:   questionDTO.QuizID,
+		Category: questionDTO.Category,
 	}
 
 	// Create answers if provided
@@ -95,6 +96,7 @@ func (s *questionService) Update(ctx context.Context, id uint, questionDTO entit
 
 	question.Text = questionDTO.Text
 	question.QuizID = questionDTO.QuizID
+	question.Category = questionDTO.Category
 
 	// Process answers - updating existing ones and adding new ones
 	if len(questionDTO.Answers) > 0 {

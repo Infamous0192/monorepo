@@ -156,6 +156,8 @@ definitions:
         items:
           $ref: '#/definitions/app_pkg_quiz_domain_entity.Answer'
         type: array
+      category:
+        type: string
       createdAt:
         type: string
       id:
@@ -173,6 +175,8 @@ definitions:
         items:
           $ref: '#/definitions/app_pkg_quiz_domain_entity.AnswerDTO'
         type: array
+      category:
+        type: string
       quizId:
         type: integer
       text:
@@ -1316,6 +1320,10 @@ paths:
         in: query
         name: quizId
         type: integer
+      - description: Filter by category
+        in: query
+        name: category
+        type: string
       - description: Search keyword
         in: query
         name: keyword

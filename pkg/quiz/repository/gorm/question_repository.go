@@ -53,6 +53,10 @@ func (r *QuestionRepository) FindAll(ctx context.Context, query entity.QuestionQ
 		db = db.Where("LOWER(text) LIKE ?", searchTerm)
 	}
 
+	if query.Category != "" {
+		db = db.Where("category = ?", query.Category)
+	}
+
 	// Count total filtered records
 	if err := db.Count(&total).Error; err != nil {
 		return nil, 0, err

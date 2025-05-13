@@ -45,6 +45,7 @@ func (h *QuestionHandler) RegisterRoutes(app fiber.Router, authMiddleware *middl
 // @Accept json
 // @Produce json
 // @Param quizId query int false "Filter by quiz ID"
+// @Param category query string false "Filter by category"
 // @Param keyword query string false "Search keyword"
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(10)

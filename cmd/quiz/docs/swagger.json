@@ -1555,6 +1555,12 @@
                     },
                     {
                         "type": "string",
+                        "description": "Filter by category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Search keyword",
                         "name": "keyword",
                         "in": "query"
@@ -3707,6 +3713,9 @@
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.Answer"
                     }
                 },
+                "category": {
+                    "type": "string"
+                },
                 "createdAt": {
                     "type": "string"
                 },
@@ -3736,6 +3745,9 @@
                     "items": {
                         "$ref": "#/definitions/app_pkg_quiz_domain_entity.AnswerDTO"
                     }
+                },
+                "category": {
+                    "type": "string"
                 },
                 "quizId": {
                     "type": "integer"
