@@ -884,8 +884,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object",
-                                            "additionalProperties": true
+                                            "$ref": "#/definitions/app_pkg_quiz_domain_entity.AuthResponseDTO"
                                         }
                                     }
                                 }
@@ -949,7 +948,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/app_pkg_quiz_domain_entity.User"
+                                            "$ref": "#/definitions/app_pkg_quiz_domain_entity.RegisterResponseDTO"
                                         }
                                     }
                                 }
@@ -3675,6 +3674,17 @@ const docTemplate = `{
                 }
             }
         },
+        "app_pkg_quiz_domain_entity.AuthResponseDTO": {
+            "type": "object",
+            "properties": {
+                "creds": {
+                    "$ref": "#/definitions/app_pkg_quiz_domain_entity.User"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "app_pkg_quiz_domain_entity.LoginDTO": {
             "type": "object",
             "required": [
@@ -3796,6 +3806,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "app_pkg_quiz_domain_entity.RegisterResponseDTO": {
+            "type": "object",
+            "properties": {
+                "creds": {
+                    "$ref": "#/definitions/app_pkg_quiz_domain_entity.User"
+                },
+                "token": {
                     "type": "string"
                 }
             }

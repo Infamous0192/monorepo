@@ -133,6 +133,13 @@ definitions:
     - text
     - value
     type: object
+  app_pkg_quiz_domain_entity.AuthResponseDTO:
+    properties:
+      creds:
+        $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+      token:
+        type: string
+    type: object
   app_pkg_quiz_domain_entity.LoginDTO:
     properties:
       password:
@@ -215,6 +222,13 @@ definitions:
     - name
     - password
     - username
+    type: object
+  app_pkg_quiz_domain_entity.RegisterResponseDTO:
+    properties:
+      creds:
+        $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+      token:
+        type: string
     type: object
   app_pkg_quiz_domain_entity.Submission:
     properties:
@@ -891,8 +905,7 @@ paths:
             - $ref: '#/definitions/http.GeneralResponse'
             - properties:
                 data:
-                  additionalProperties: true
-                  type: object
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.AuthResponseDTO'
               type: object
         "400":
           description: Bad Request
@@ -931,7 +944,7 @@ paths:
             - $ref: '#/definitions/http.GeneralResponse'
             - properties:
                 data:
-                  $ref: '#/definitions/app_pkg_quiz_domain_entity.User'
+                  $ref: '#/definitions/app_pkg_quiz_domain_entity.RegisterResponseDTO'
               type: object
         "400":
           description: Bad Request

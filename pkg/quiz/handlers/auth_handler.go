@@ -42,7 +42,7 @@ func (h *AuthHandler) RegisterRoutes(app fiber.Router, authMiddleware *middlewar
 // @Accept json
 // @Produce json
 // @Param user body entity.RegisterDTO true "User registration information"
-// @Success 201 {object} http.GeneralResponse{data=entity.User}
+// @Success 201 {object} http.GeneralResponse{data=entity.RegisterResponseDTO}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 409 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
@@ -60,11 +60,23 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		return err
 	}
 
-	// Return the created user
+	// Generate token for the registered user
+	token, _, err := h.authService.Login(registerDTO.Username, registerDTO.Password)
+	if err != nil {
+		return err
+	}
+
+	// Create response DTO
+	response := entity.RegisterResponseDTO{
+		Token: token,
+		Creds: user,
+	}
+
+	// Return the token and user credentials
 	return c.Status(fiber.StatusCreated).JSON(http.GeneralResponse{
 		Status:  fiber.StatusCreated,
 		Message: "User registered successfully",
-		Data:    user,
+		Data:    response,
 	})
 }
 
@@ -75,7 +87,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param credentials body entity.LoginDTO true "Login credentials"
-// @Success 200 {object} http.GeneralResponse{data=map[string]interface{}}
+// @Success 200 {object} http.GeneralResponse{data=entity.AuthResponseDTO}
 // @Failure 400 {object} validation.ValidationError
 // @Failure 401 {object} http.GeneralResponse
 // @Failure 500 {object} http.GeneralResponse
@@ -93,14 +105,17 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		return err
 	}
 
+	// Create response DTO
+	response := entity.AuthResponseDTO{
+		Token: token,
+		Creds: user,
+	}
+
 	// Return the JWT token and user credentials
 	return c.JSON(http.GeneralResponse{
 		Status:  fiber.StatusOK,
 		Message: "Login successful",
-		Data: fiber.Map{
-			"token": token,
-			"creds": user,
-		},
+		Data:    response,
 	})
 }
 
