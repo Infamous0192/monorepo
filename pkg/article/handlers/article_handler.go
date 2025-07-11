@@ -48,7 +48,7 @@ func (h *ArticleHandler) RegisterRoutes(app fiber.Router, authMiddleware fiber.H
 	// Protected routes (API key required)
 	protected := api.Use(authMiddleware)
 	protected.Post("/", h.CreateArticle)
-	protected.Put("/:id", h.UpdateArticle)
+	protected.Post("/:id", h.UpdateArticle)
 	protected.Delete("/:id", h.DeleteArticle)
 }
 
@@ -263,7 +263,7 @@ func (h *ArticleHandler) CreateArticle(c *fiber.Ctx) error {
 // @Failure 404 {object} error
 // @Failure 500 {object} error
 // @Security BearerAuth
-// @Router /articles/{id} [put]
+// @Router /articles/{id} [post]
 func (h *ArticleHandler) UpdateArticle(c *fiber.Ctx) error {
 	id, err := h.validation.ParamsInt(c)
 	if err != nil {
