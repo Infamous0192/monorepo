@@ -23,7 +23,7 @@ func NewSubmissionRepository(db *gorm.DB) repository.SubmissionRepository {
 // FindOne retrieves a single submission by ID
 func (r *SubmissionRepository) FindOne(ctx context.Context, id uint) (*entity.Submission, error) {
 	var submission entity.Submission
-	tx := r.db.WithContext(ctx).Preload("Quiz").Preload("Question").Preload("Answer").First(&submission, id)
+	tx := r.db.WithContext(ctx).Preload("Quiz").Preload("Question").Preload("Answer").Preload("User").First(&submission, id)
 	if tx.Error != nil {
 		if tx.Error == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -74,6 +74,7 @@ func (r *SubmissionRepository) FindAll(ctx context.Context, query entity.Submiss
 		Preload("Quiz").
 		Preload("Question").
 		Preload("Answer").
+		Preload("User").
 		Find(&submissions).Error
 	if err != nil {
 		return nil, 0, err
