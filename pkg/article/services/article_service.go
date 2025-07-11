@@ -197,6 +197,11 @@ func (s *articleService) Update(ctx context.Context, id uint, dto entity.Article
 		article.Tags = tags
 	}
 
+	// Update thumbnail if provided
+	if dto.ThumbnailID != nil {
+		article.ThumbnailID = dto.ThumbnailID
+	}
+
 	// Update article
 	if err := s.articleRepo.Update(ctx, article); err != nil {
 		return nil, err
