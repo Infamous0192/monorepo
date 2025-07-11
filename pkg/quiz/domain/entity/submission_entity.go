@@ -18,7 +18,8 @@ type Submission struct {
 	Answer   *Answer `json:"answer,omitempty" gorm:"constraint:OnDelete:CASCADE;"`
 	AnswerID uint    `json:"-"`
 
-	UserID uint `json:"-"`
+	UserID uint  `json:"-"`
+	User   *User `json:"user,omitempty" gorm:"constraint:OnDelete:CASCADE;"`
 
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at;autoUpdateTime"`
