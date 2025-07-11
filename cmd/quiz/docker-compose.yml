@@ -19,10 +19,10 @@ services:
       - DB_PORT=5432
       - APP_ENVIRONMENT=development
       - APP_API_KEY=your-secure-api-key
+      - APP_UPLOAD_PATH=/app/uploads
     volumes:
       - ./config:/app/config
-      - ../../uploads:/app/uploads:rw
-    user: "1000:1000"  # Set user to match appuser
+      - quiz-uploads:/app/uploads
     networks:
       - quiz-network
 
@@ -60,6 +60,7 @@ services:
 volumes:
   quiz-db-data:
   pgadmin-data:
+  quiz-uploads:
 
 networks:
   quiz-network:
